@@ -2283,13 +2283,18 @@ class BaujiTradersGUI:
     
     def send_to_printer(self, receipt_text):
         """Send receipt to thermal printer"""
+        # Import libraries at top level to ensure availability throughout the method
+        import os
+        import tempfile
+        
+        # Initialize temp_file variable at the top level
+        temp_file = None
+        
         try:
             # Import necessary libraries
             import win32print
             import win32ui
             import win32con
-            import tempfile
-            import os
             
             # Create a temporary file for printing (useful for fallback)
             with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False, encoding='utf-8') as f:
@@ -2393,7 +2398,7 @@ class BaujiTradersGUI:
             
             try:
                 # Create temporary file if not already created
-                if not os.path.exists(temp_file):
+                if not temp_file or not os.path.exists(temp_file):
                     with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False, encoding='utf-8') as f:
                         f.write(receipt_text)
                         temp_file = f.name
@@ -2478,7 +2483,7 @@ class BaujiTradersGUI:
                         print(f"Direct printing error: {direct_err}")
                         response = messagebox.askyesno("Notepad Fallback", 
                                                      "Direct printing failed. Try via Notepad?")
-                        if response:
+                        if response and temp_file and os.path.exists(temp_file):
                             os.system(f'notepad /p "{temp_file}"')
                             self.status_var.set("Used Notepad fallback for printing")
                             return True
