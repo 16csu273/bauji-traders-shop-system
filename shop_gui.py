@@ -2102,9 +2102,15 @@ class BaujiTradersGUI:
                 self.send_to_printer(receipt)
                 return
             
+            # Generate PDF in temp location
+            import tempfile
+            import os
+            pdf_path = os.path.join(tempfile.gettempdir(), f"receipt_{transaction_id}.pdf")
+            self.generate_pdf_receipt(receipt, pdf_path)
+            
             # Create receipt window optimized for thermal paper preview
             receipt_window = tk.Toplevel(self.root)
-            receipt_window.title("🧾 Thermal Receipt Preview")
+            receipt_window.title("🧾 Receipt Preview")
             receipt_window.geometry("400x600")
             
             # Receipt text with thermal paper font
@@ -2113,9 +2119,42 @@ class BaujiTradersGUI:
             text_widget.insert(tk.END, receipt)
             text_widget.config(state=tk.DISABLED)
             
-            # Print button
-            ttk.Button(receipt_window, text="🖨️ Print to Thermal Printer", 
-                      command=lambda: self.send_to_printer(receipt)).pack(pady=10)
+            # Button frame
+            button_frame = ttk.Frame(receipt_window)
+            button_frame.pack(fill=tk.X, pady=10, padx=10)
+            
+            # Print buttons
+            ttk.Button(button_frame, text="🖨️ Print as PDF", 
+                     command=lambda: self.send_to_printer(receipt)).pack(side=tk.LEFT, padx=5)
+            ttk.Button(button_frame, text="💾 Save PDF", 
+                     command=lambda: self.save_receipt_pdf(pdf_path, transaction_id)).pack(side=tk.LEFT, padx=5)
+            ttk.Button(button_frame, text="📱 View PDF", 
+                      command=lambda: os.startfile(pdf_path) if os.path.exists(pdf_path) else None).pack(side=tk.LEFT, padx=5)
+                      
+    def save_receipt_pdf(self, temp_pdf_path, transaction_id):
+        """Save the PDF receipt to a user-selected location"""
+        try:
+            import os
+            # Ask user for save location
+            save_path = filedialog.asksaveasfilename(
+                defaultextension=".pdf",
+                filetypes=[("PDF files", "*.pdf")],
+                initialfile=f"Receipt_{transaction_id}.pdf",
+                title="Save Receipt PDF"
+            )
+            
+            if save_path:
+                # Copy the temporary PDF to the selected location
+                import shutil
+                shutil.copy2(temp_pdf_path, save_path)
+                self.status_var.set(f"Receipt saved to {save_path}")
+                messagebox.showinfo("PDF Saved", f"Receipt saved to {save_path}")
+                
+                # Open the saved PDF
+                os.startfile(save_path)
+        except Exception as e:
+            messagebox.showerror("Save Error", f"Failed to save PDF: {str(e)}")
+            self.status_var.set(f"Error saving PDF: {str(e)}")
                       
         except Exception as e:
             messagebox.showerror("Error", f"Failed to generate receipt: {str(e)}")
@@ -2280,6 +2319,86 @@ class BaujiTradersGUI:
             
         except Exception as e:
             return f"Error generating receipt: {str(e)}"
+            
+    def generate_pdf_receipt(self, receipt_text, output_path):
+        """
+        Generate a PDF receipt from the receipt text
+        
+        Args:
+            receipt_text: The formatted receipt text
+            output_path: The file path where the PDF will be saved
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            from reportlab.lib.pagesizes import A4
+            from reportlab.lib import colors
+            from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.lib.units import inch
+            from reportlab.pdfbase import pdfmetrics
+            from reportlab.pdfbase.ttfonts import TTFont
+            import os
+            
+            # Register a monospace font for better receipt formatting
+            try:
+                # Try to use Courier font which is commonly available
+                pdfmetrics.registerFont(TTFont('Courier', 'C:\\Windows\\Fonts\\cour.ttf'))
+                font_name = 'Courier'
+            except:
+                # Fall back to default
+                font_name = 'Courier'
+                
+            # Create PDF document
+            doc = SimpleDocTemplate(
+                output_path,
+                pagesize=A4,
+                rightMargin=72, 
+                leftMargin=72,
+                topMargin=72, 
+                bottomMargin=72
+            )
+            
+            # Create styles
+            styles = getSampleStyleSheet()
+            receipt_style = ParagraphStyle(
+                'Receipt',
+                fontName=font_name,
+                fontSize=10,
+                leading=12,
+                spaceAfter=10,
+                wordWrap='CJK',
+                alignment=0  # Left alignment
+            )
+            
+            # Process receipt text to maintain formatting in PDF
+            lines = receipt_text.split('\n')
+            story = []
+            
+            # Create a paragraph for each line to maintain formatting
+            for line in lines:
+                if line.strip():  # Skip empty lines
+                    p = Paragraph(f"<pre>{line}</pre>", receipt_style)
+                    story.append(p)
+                else:
+                    story.append(Spacer(1, 6))  # Add small space for empty lines
+            
+            # Build the PDF
+            doc.build(story)
+            
+            self.status_var.set(f"✅ PDF receipt created: {output_path}")
+            return True
+        
+        except ImportError:
+            self.status_var.set("Unable to create PDF - ReportLab library not installed")
+            messagebox.showwarning("PDF Error", "ReportLab library is not installed. Using text receipt instead.")
+            return False
+            
+        except Exception as e:
+            self.status_var.set(f"Error creating PDF: {str(e)}")
+            messagebox.showerror("PDF Error", f"Failed to create PDF receipt: {str(e)}")
+            return False
     
     def send_to_printer(self, receipt_text):
         """Send receipt to thermal printer"""
@@ -2287,10 +2406,27 @@ class BaujiTradersGUI:
         import os
         import tempfile
         
-        # Initialize temp_file variable at the top level
-        temp_file = None
+        # Initialize temp_file variables at the top level
+        txt_file = None
+        pdf_file = None
         
         try:
+            # Try PDF printing first
+            pdf_file = os.path.join(tempfile.gettempdir(), f"receipt_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
+            if self.generate_pdf_receipt(receipt_text, pdf_file):
+                # Try to print the PDF file
+                try:
+                    # On Windows, PDF files can be printed with shell command
+                    print_result = os.system(f'start /min "" powershell -Command "Start-Process -FilePath \'{pdf_file}\' -Verb Print -PassThru | %{{sleep 2; $_.CloseMainWindow()}} | Out-Null"')
+                    if print_result == 0:
+                        self.status_var.set(f"✅ PDF receipt sent to printer")
+                        messagebox.showinfo("Print", "✅ PDF receipt sent to printer!")
+                        return True
+                except Exception as pdf_print_err:
+                    self.status_var.set(f"PDF print failed: {str(pdf_print_err)}")
+            
+            # If PDF printing failed, continue with regular thermal printer approach
+            
             # Import necessary libraries
             import win32print
             import win32ui
@@ -2299,7 +2435,7 @@ class BaujiTradersGUI:
             # Create a temporary file for printing (useful for fallback)
             with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False, encoding='utf-8') as f:
                 f.write(receipt_text)
-                temp_file = f.name
+                txt_file = f.name
             
             # List of possible thermal printer names
             thermal_printer_keywords = ["TVS", "3200", "LITE", "THERMAL", "RECEIPT", "POS", "EPSON", "TM-"]
@@ -2383,7 +2519,8 @@ class BaujiTradersGUI:
             
             # Clean up temporary file
             try:
-                os.unlink(temp_file)
+                if txt_file and os.path.exists(txt_file):
+                    os.unlink(txt_file)
             except Exception:
                 # If we can't delete the temp file, it's not critical
                 pass
@@ -2398,14 +2535,14 @@ class BaujiTradersGUI:
             
             try:
                 # Create temporary file if not already created
-                if not temp_file or not os.path.exists(temp_file):
+                if not txt_file or not os.path.exists(txt_file):
                     with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False, encoding='utf-8') as f:
                         f.write(receipt_text)
-                        temp_file = f.name
+                        txt_file = f.name
                 
                 # Send to default printer using notepad
                 # Use /p switch for silent printing
-                print_result = os.system(f'notepad /p "{temp_file}"')
+                print_result = os.system(f'notepad /p "{txt_file}"')
                 
                 # Check if the command was successful
                 if print_result == 0:
@@ -2419,7 +2556,8 @@ class BaujiTradersGUI:
                 
                 # Clean up
                 try:
-                    os.unlink(temp_file)
+                    if txt_file and os.path.exists(txt_file):
+                        os.unlink(txt_file)
                 except Exception:
                     # Not critical if cleanup fails
                     pass
@@ -2483,9 +2621,14 @@ class BaujiTradersGUI:
                         print(f"Direct printing error: {direct_err}")
                         response = messagebox.askyesno("Notepad Fallback", 
                                                      "Direct printing failed. Try via Notepad?")
-                        if response and temp_file and os.path.exists(temp_file):
-                            os.system(f'notepad /p "{temp_file}"')
+                        if response and txt_file and os.path.exists(txt_file):
+                            os.system(f'notepad /p "{txt_file}"')
                             self.status_var.set("Used Notepad fallback for printing")
+                            return True
+                        elif response and pdf_file and os.path.exists(pdf_file):
+                            # Try with the PDF file as a last resort
+                            os.system(f'start "" "{pdf_file}"')
+                            self.status_var.set("Opened PDF receipt for manual printing")
                             return True
             except Exception:
                 pass

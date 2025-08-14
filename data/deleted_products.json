@@ -1,1 +1,62 @@
-{}
+{
+  "MILK": {
+    "product_data": {
+      "Sr_No": 394,
+      "Product_Name": "MILK",
+      "Quantity": 2,
+      "Unit": NaN,
+      "MRP": 26.0,
+      "Purchase_Rate": NaN,
+      "Amount": NaN,
+      "Category": "General",
+      "Cost_Price": 29.0,
+      "Actual_Margin_Percent": -10.344827586206897,
+      "Actual_Profit_Per_Unit": NaN,
+      "Total_Actual_Profit": NaN,
+      "SP_5_Percent": 24.7,
+      "SP_10_Percent": 23.4,
+      "SP_5_Margin_Percent": NaN,
+      "SP_10_Margin_Percent": NaN,
+      "Brand": NaN,
+      "Size": NaN,
+      "Supplier": NaN,
+      "Last_Updated": NaN,
+      "Status": NaN,
+      "Stock_Quantity": NaN,
+      "Barcode": NaN,
+      "Barcode_Clean": NaN
+    },
+    "deleted_at": "2025-08-14 17:15:46",
+    "deleted_by": "Admin"
+  },
+  "MILK2": {
+    "product_data": {
+      "Sr_No": 394,
+      "Product_Name": "MILK2",
+      "Quantity": 2,
+      "Unit": NaN,
+      "MRP": 40.0,
+      "Purchase_Rate": NaN,
+      "Amount": NaN,
+      "Category": "Health Drinks",
+      "Cost_Price": 26.0,
+      "Actual_Margin_Percent": 53.84615384615385,
+      "Actual_Profit_Per_Unit": NaN,
+      "Total_Actual_Profit": NaN,
+      "SP_5_Percent": 38.0,
+      "SP_10_Percent": 36.0,
+      "SP_5_Margin_Percent": NaN,
+      "SP_10_Margin_Percent": NaN,
+      "Brand": NaN,
+      "Size": NaN,
+      "Supplier": NaN,
+      "Last_Updated": NaN,
+      "Status": NaN,
+      "Stock_Quantity": NaN,
+      "Barcode": NaN,
+      "Barcode_Clean": NaN
+    },
+    "deleted_at": "2025-08-14 17:16:35",
+    "deleted_by": "Admin"
+  }
+}
