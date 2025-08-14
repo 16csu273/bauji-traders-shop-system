@@ -59,7 +59,7 @@ A professional-grade shop management system with barcode scanning, inventory man
 - **Financial overview** - Revenue, profit, trends
 
 ### 🧾 Receipt Printing
-- **Thermal printer support** - 3-inch (80mm) thermal receipts
+- **Thermal printer support** - Optimized for TVS 3200 Lite and other 3-inch (80mm) thermal printers
 - **Professional formatting** - 42-character width layout
 - **Complete details** - Items, quantities, prices, totals, customer info
 - **Direct printing** - No preview dialogs for fast checkout
@@ -192,8 +192,9 @@ python rebuild_customers.py
 
 **Thermal printer issues**
 - Verify printer is connected and powered on
-- Install printer drivers
+- Install printer drivers (TVS 3200 Lite or compatible)
 - Set as default printer in Windows
+- Ensure receipt format is correct (check receipt_formatter.py)
 - Test with Notepad print
 
 **Inventory not loading**
@@ -255,4 +256,4 @@ Developed for internal business use.
 
 **🎉 Thank you for choosing BAUJI TRADERS Shop Management System!**
 
-*For the best experience, ensure your barcode scanner is configured for keyboard emulation and your thermal printer supports 80mm (3-inch) paper.*
+*For the best experience, ensure your barcode scanner is configured for keyboard emulation and your thermal printer (TVS 3200 Lite or compatible) supports 80mm (3-inch) paper. The receipt format has been specifically optimized for this paper size.*
