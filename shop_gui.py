@@ -2155,9 +2155,6 @@ class BaujiTradersGUI:
         except Exception as e:
             messagebox.showerror("Save Error", f"Failed to save PDF: {str(e)}")
             self.status_var.set(f"Error saving PDF: {str(e)}")
-                      
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to generate receipt: {str(e)}")
     
     def generate_receipt_direct(self, transaction_id):
         """Generate receipt text directly for 3-inch thermal printer"""
