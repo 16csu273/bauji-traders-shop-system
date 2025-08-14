@@ -1,0 +1,2 @@
+Purchase_ID,Date,Time,Supplier,Invoice_No,Product_Name,Quantity,Cost_Per_Unit,Total_Amount,MRP
+PUR20250804191527,2025-08-04,19:15:27,rama enterprise,1234,sesame oil 885ml,24,100.0,2400.0,130.0
