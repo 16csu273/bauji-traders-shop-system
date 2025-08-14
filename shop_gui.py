@@ -2130,6 +2130,8 @@ class BaujiTradersGUI:
                      command=lambda: self.save_receipt_pdf(pdf_path, transaction_id)).pack(side=tk.LEFT, padx=5)
             ttk.Button(button_frame, text="📱 View PDF", 
                       command=lambda: os.startfile(pdf_path) if os.path.exists(pdf_path) else None).pack(side=tk.LEFT, padx=5)
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to display receipt: {str(e)}")
                       
     def save_receipt_pdf(self, temp_pdf_path, transaction_id):
         """Save the PDF receipt to a user-selected location"""
