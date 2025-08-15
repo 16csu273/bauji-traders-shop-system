@@ -2343,15 +2343,41 @@ class BaujiTradersGUI:
                 messagebox.showerror("Error", f"Failed to generate receipt: {error}")
                 return
             
-            # Add auto-print JavaScript to the HTML
+            # Add auto-print JavaScript to the HTML - direct print without preview
             auto_print_script = """
             <script>
                 window.onload = function() {
                     // Wait a moment for the page to fully load
                     setTimeout(function() {
-                        window.print();
+                        // Try to print directly without preview dialog
+                        if (window.print) {
+                            window.print();
+                        }
+                        
+                        // Additional method: Try to trigger direct print via media query
+                        var style = document.createElement('style');
+                        style.innerHTML = '@media print { body { -webkit-print-color-adjust: exact; } }';
+                        document.head.appendChild(style);
+                        
+                        // Force immediate print without dialog (works in some browsers)
+                        setTimeout(function() {
+                            if (typeof window.print === 'function') {
+                                window.print();
+                                // Close window after printing attempt
+                                setTimeout(function() {
+                                    window.close();
+                                }, 2000);
+                            }
+                        }, 500);
                     }, 1000);
                 };
+                
+                // Additional event listener for when page is fully loaded
+                document.addEventListener('DOMContentLoaded', function() {
+                    setTimeout(function() {
+                        window.print();
+                    }, 1500);
+                });
             </script>
             """
             
@@ -2370,19 +2396,57 @@ class BaujiTradersGUI:
             # Open in browser
             webbrowser.open(f'file://{temp_file.name}')
             
-            # Backup method: Use pyautogui as fallback
+            # Alternative method: Try to print via Windows command line (for direct printing)
+            def try_windows_direct_print():
+                time.sleep(2)  # Wait for browser to load
+                try:
+                    # Try using Windows print command for direct printing
+                    import subprocess
+                    import os
+                    
+                    # Method 1: Try printing HTML file directly to default printer
+                    try:
+                        # This command attempts to print the file directly
+                        subprocess.run(['powershell', '-Command', f'Start-Process -FilePath "{temp_file.name}" -Verb Print'], 
+                                     shell=True, check=True, timeout=10)
+                        print("Direct print attempted via Windows print verb")
+                    except:
+                        # Method 2: Fallback to browser automation
+                        pass
+                        
+                except Exception as e:
+                    print(f"Windows direct print failed: {e}")
+            
+            # Start Windows direct print attempt
+            threading.Thread(target=try_windows_direct_print, daemon=True).start()
+            
+            # Backup method: Use pyautogui for direct printing
             def trigger_print_fallback():
                 time.sleep(3)  # Wait for page to load
                 try:
                     import pyautogui
                     # Check if pyautogui is available and working
                     pyautogui.FAILSAFE = False  # Disable failsafe for automation
-                    pyautogui.hotkey('ctrl', 'p')  # Trigger print dialog
-                    print("Print dialog triggered via Ctrl+P")
+                    
+                    # Method 1: Try Ctrl+P to open print dialog
+                    pyautogui.hotkey('ctrl', 'p')
+                    time.sleep(1)  # Wait for print dialog to open
+                    
+                    # Method 2: Try to send Enter to default printer (skip preview)
+                    # This works if default printer is set and "Print" button is focused
+                    pyautogui.press('enter')
+                    
+                    print("Direct print commands sent via pyautogui")
                 except ImportError:
                     print("pyautogui not available - using JavaScript auto-print only")
                 except Exception as e:
-                    print(f"Failed to trigger print with pyautogui: {e}")
+                    print(f"Failed to trigger direct print with pyautogui: {e}")
+                    # Fallback: Just send Ctrl+P
+                    try:
+                        import pyautogui
+                        pyautogui.hotkey('ctrl', 'p')
+                    except:
+                        pass
             
             # Start print trigger in background as fallback
             threading.Thread(target=trigger_print_fallback, daemon=True).start()
