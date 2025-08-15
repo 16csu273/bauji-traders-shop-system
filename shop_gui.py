@@ -9,6 +9,7 @@ from tkinter import ttk, messagebox, filedialog, simpledialog
 import pandas as pd
 import json
 import os
+import math
 from datetime import datetime, date
 import threading
 
@@ -975,7 +976,7 @@ class BaujiTradersGUI:
                 cost_price = row['Cost_Price']
                 mrp = row['MRP']
                 profit_margin = mrp - cost_price
-                sell_price = round(cost_price + (0.40 * profit_margin))
+                sell_price = math.ceil(cost_price + (0.40 * profit_margin))
                 
                 self.products_tree.insert('', tk.END, values=(
                     row['Product_Name'],        # Name
@@ -1072,7 +1073,7 @@ class BaujiTradersGUI:
                 cost_price = row['Cost_Price']
                 mrp = row['MRP']
                 profit_margin = mrp - cost_price
-                sell_price = round(cost_price + (0.40 * profit_margin))
+                sell_price = math.ceil(cost_price + (0.40 * profit_margin))
                 
                 self.inventory_tree.insert('', tk.END, values=(
                     row['Product_Name'],
@@ -1246,7 +1247,7 @@ class BaujiTradersGUI:
                 cost_price = row['Cost_Price']
                 mrp = row['MRP']
                 profit_margin = mrp - cost_price
-                sell_price = round(cost_price + (0.40 * profit_margin))
+                sell_price = math.ceil(cost_price + (0.40 * profit_margin))
                 
                 self.products_tree.insert('', tk.END, values=(
                     row['Product_Name'],        # Name
@@ -1517,7 +1518,7 @@ class BaujiTradersGUI:
             
             # Calculate sell price
             profit_margin = mrp - cost_price
-            sell_price = round(cost_price + (0.40 * profit_margin))
+            sell_price = math.ceil(cost_price + (0.40 * profit_margin))
             
             # Check if product already in cart
             existing_item = None
@@ -1611,7 +1612,7 @@ class BaujiTradersGUI:
                 
                 # Calculate sell price
                 profit_margin = mrp - cost_price
-                sell_price = round(cost_price + (0.40 * profit_margin))
+                sell_price = math.ceil(cost_price + (0.40 * profit_margin))
                 
                 # Add new item to cart
                 cart_item = {
@@ -2092,547 +2093,236 @@ class BaujiTradersGUI:
             print(f"Error saving customer info: {e}")
     
     def print_receipt(self, transaction_id, direct_print=False):
-        """Print receipt for transaction"""
+        """Print receipt for transaction using HTML template"""
         try:
-            # Generate receipt text
-            receipt = self.generate_receipt_direct(transaction_id)
+            # Import our HTML receipt generator
+            from html_receipt_generator import HTMLReceiptGenerator
+            
+            # Initialize generator
+            generator = HTMLReceiptGenerator(self.shop_manager.sales_file, self.shop_manager.inventory_file)
             
             if direct_print:
-                # Direct print to thermal printer without preview
-                self.send_to_printer(receipt)
+                # Direct print - open in browser for user to print
+                success = generator.preview_receipt(transaction_id)
+                if success:
+                    messagebox.showinfo("Print", "Receipt opened in browser. Use Ctrl+P to print.")
+                else:
+                    messagebox.showerror("Error", "Failed to generate receipt for printing")
                 return
             
-            # Generate PDF in temp location
-            import tempfile
-            import os
-            pdf_path = os.path.join(tempfile.gettempdir(), f"receipt_{transaction_id}.pdf")
-            self.generate_pdf_receipt(receipt, pdf_path)
+            # Generate HTML receipt
+            html_content, error = generator.generate_receipt_html(transaction_id)
             
-            # Create receipt window optimized for thermal paper preview
+            if error:
+                messagebox.showerror("Error", f"Failed to generate receipt: {error}")
+                return
+            
+            # Create receipt preview window
+            self.show_html_receipt_preview(transaction_id, html_content, generator)
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to display receipt: {str(e)}")
+    
+    def show_html_receipt_preview(self, transaction_id, html_content, generator):
+        """Show HTML receipt preview window"""
+        try:
+            import tempfile
+            import webbrowser
+            import os
+            
+            # Create receipt preview window
             receipt_window = tk.Toplevel(self.root)
             receipt_window.title("🧾 Receipt Preview")
-            receipt_window.geometry("400x600")
+            receipt_window.geometry("500x700")
+            receipt_window.transient(self.root)
+            receipt_window.grab_set()
             
-            # Receipt text with thermal paper font
-            text_widget = tk.Text(receipt_window, font=("Courier", 8), width=42)
-            text_widget.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-            text_widget.insert(tk.END, receipt)
+            # Header frame
+            header_frame = ttk.Frame(receipt_window)
+            header_frame.pack(fill=tk.X, padx=10, pady=5)
+            
+            ttk.Label(header_frame, text=f"Receipt Preview - {transaction_id}", 
+                     font=("Arial", 12, "bold")).pack()
+            
+            # Preview frame with embedded browser-like view
+            preview_frame = ttk.LabelFrame(receipt_window, text="Receipt Preview")
+            preview_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+            
+            # Create a text widget to show the receipt content (simplified view)
+            text_widget = tk.Text(preview_frame, font=("Courier", 9), width=50, height=25, wrap=tk.WORD)
+            scrollbar = ttk.Scrollbar(preview_frame, orient=tk.VERTICAL, command=text_widget.yview)
+            text_widget.configure(yscrollcommand=scrollbar.set)
+            
+            text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # Extract key information from HTML for preview
+            preview_text = self.extract_receipt_preview_text(transaction_id)
+            text_widget.insert(tk.END, preview_text)
             text_widget.config(state=tk.DISABLED)
             
             # Button frame
             button_frame = ttk.Frame(receipt_window)
-            button_frame.pack(fill=tk.X, pady=10, padx=10)
+            button_frame.pack(fill=tk.X, padx=10, pady=10)
             
-            # Print buttons
-            ttk.Button(button_frame, text="🖨️ Print as PDF", 
-                     command=lambda: self.send_to_printer(receipt)).pack(side=tk.LEFT, padx=5)
-            ttk.Button(button_frame, text="💾 Save PDF", 
-                     command=lambda: self.save_receipt_pdf(pdf_path, transaction_id)).pack(side=tk.LEFT, padx=5)
-            ttk.Button(button_frame, text="📱 View PDF", 
-                      command=lambda: os.startfile(pdf_path) if os.path.exists(pdf_path) else None).pack(side=tk.LEFT, padx=5)
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to display receipt: {str(e)}")
-                      
-    def save_receipt_pdf(self, temp_pdf_path, transaction_id):
-        """Save the PDF receipt to a user-selected location"""
-        try:
-            import os
-            # Ask user for save location
-            save_path = filedialog.asksaveasfilename(
-                defaultextension=".pdf",
-                filetypes=[("PDF files", "*.pdf")],
-                initialfile=f"Receipt_{transaction_id}.pdf",
-                title="Save Receipt PDF"
-            )
+            # Create buttons
+            ttk.Button(button_frame, text="🌐 Open in Browser", 
+                     command=lambda: self.open_receipt_in_browser(transaction_id, generator)).pack(side=tk.LEFT, padx=5)
             
-            if save_path:
-                # Copy the temporary PDF to the selected location
-                import shutil
-                shutil.copy2(temp_pdf_path, save_path)
-                self.status_var.set(f"Receipt saved to {save_path}")
-                messagebox.showinfo("PDF Saved", f"Receipt saved to {save_path}")
-                
-                # Open the saved PDF
-                os.startfile(save_path)
+            ttk.Button(button_frame, text="�️ Print Receipt", 
+                     command=lambda: self.print_html_receipt(transaction_id, generator)).pack(side=tk.LEFT, padx=5)
+            
+            ttk.Button(button_frame, text="� Save HTML", 
+                     command=lambda: self.save_html_receipt(transaction_id, html_content)).pack(side=tk.LEFT, padx=5)
+            
+            ttk.Button(button_frame, text="❌ Close", 
+                     command=receipt_window.destroy).pack(side=tk.RIGHT, padx=5)
+            
+            # Info frame
+            info_frame = ttk.Frame(receipt_window)
+            info_frame.pack(fill=tk.X, padx=10, pady=5)
+            
+            ttk.Label(info_frame, text="💡 Tip: Use 'Open in Browser' for best preview and printing experience", 
+                     font=("Arial", 9), foreground="gray").pack()
+            
         except Exception as e:
-            messagebox.showerror("Save Error", f"Failed to save PDF: {str(e)}")
-            self.status_var.set(f"Error saving PDF: {str(e)}")
+            messagebox.showerror("Error", f"Failed to create preview window: {str(e)}")
     
-    def generate_receipt_direct(self, transaction_id):
-        """Generate receipt text directly for 3-inch thermal printer"""
+    def extract_receipt_preview_text(self, transaction_id):
+        """Extract text content for receipt preview"""
         try:
-            # Import receipt formatter if needed
-            try:
-                from receipt_formatter import ReceiptFormatter
-                # Use the external formatter if available
-                receipt = ReceiptFormatter.generate_receipt(
-                    transaction_id, 
-                    self.shop_manager.sales_file, 
-                    self.shop_manager.inventory_file
-                )
-                return receipt
-            except ImportError:
-                pass  # Fall back to built-in formatter if module not found
-            
-            # Load sales data and inventory data
+            # Load transaction data for preview
             sales_df = pd.read_csv(self.shop_manager.sales_file)
             transaction_sales = sales_df[sales_df['Transaction_ID'] == transaction_id]
             
             if transaction_sales.empty:
                 return "Receipt not found"
             
-            # Load inventory for MRP lookup
+            # Load inventory
             inventory_df = pd.read_csv(self.shop_manager.inventory_file)
             
             # Get transaction details
             first_row = transaction_sales.iloc[0]
             
-            # Receipt width for 3-inch thermal printer
-            receipt_width = 35  # Adjusted width for 3-inch paper
+            # Build preview text
+            preview = "🏪 BAUJI TRADERS\n"
+            preview += "1690 30FT ROAD, JAWAHAR COLONY\n"
+            preview += "NIT FARIDABAD\n"
+            preview += "PH: 9911148114, 9555269666\n"
+            preview += "=" * 40 + "\n"
             
-            # Format for centered text
-            def center_text(text, width):
-                if len(text) >= width:
-                    return text
-                padding = (width - len(text)) // 2
-                return ' ' * padding + text + ' ' * (width - padding - len(text))
+            preview += f"Date/Time: {first_row['Date']} {first_row['Time']}\n"
+            preview += f"Customer: {first_row['Customer_Name']}\n"
+            if first_row['Customer_Phone'] and str(first_row['Customer_Phone']).strip() not in ['none', 'nan', '']:
+                preview += f"Phone: {first_row['Customer_Phone']}\n"
+            preview += f"Payment: {first_row['Payment_Method']}\n"
+            preview += "=" * 40 + "\n"
             
-            receipt = "\n"  # Start with a blank line
-            receipt += f"{center_text('BAUJI TRADERS', receipt_width)}\n"
-            receipt += f"{center_text('CONFECTIONERY STORE', receipt_width)}\n"
-            receipt += f"{'-'*receipt_width}\n"
-            receipt += f"Address: 1690 30FT ROAD,\n"
-            receipt += f"         JAWAHAR COLONY\n"
-            receipt += f"Phone: 9911148114, 9555269666\n\n"
+            # Items
+            preview += f"{'Item':<20} {'Qty':>3} {'MRP':>5} {'Rate':>5} {'Total':>6}\n"
+            preview += "-" * 40 + "\n"
             
-            receipt += f"TXN ID: {transaction_id}\n"
-            receipt += f"Date: {first_row['Date']}\n"
-            receipt += f"Time: {first_row['Time']}\n"
-            
-            # Only include customer info if available
-            if first_row['Customer_Name'] and first_row['Customer_Name'].strip().lower() != 'none' and first_row['Customer_Name'].strip() != '':
-                receipt += f"Customer: {first_row['Customer_Name']}\n"
-                if first_row['Customer_Phone'] and str(first_row['Customer_Phone']).strip() != '':
-                    receipt += f"Phone: {first_row['Customer_Phone']}\n"
-            
-            receipt += f"Payment: {first_row['Payment_Method']}\n"
-            
-            receipt += f"{'-'*receipt_width}\n"
-            receipt += f"{center_text('ITEMS', receipt_width)}\n"
-            receipt += f"{'-'*receipt_width}\n"
-            
-            # Item header - exactly as shown in the screenshot
-            receipt += "ITEM            QTY MRP D% PRICE TOTAL\n"
-            receipt += f"{'-'*receipt_width}\n"
-            
+            total_mrp = 0
             total_amount = 0
-            total_mrp_amount = 0
             
             for _, row in transaction_sales.iterrows():
                 product_name = row['Product_Name']
                 quantity = int(row['Quantity_Sold'])
-                sell_price = float(row['Unit_Price'])
+                unit_price = float(row['Unit_Price'])
+                line_total = float(row['Total_Amount'])
                 
-                # Find MRP from inventory
+                # Find MRP
                 product_info = inventory_df[inventory_df['Product_Name'] == product_name]
                 if not product_info.empty:
                     mrp = float(product_info.iloc[0]['MRP'])
                 else:
-                    mrp = sell_price  # Fallback if product not found
+                    mrp = unit_price
                 
-                # Calculate discount percentage
-                if mrp > 0:
-                    discount_per_unit = mrp - sell_price
-                    discount_percentage = (discount_per_unit / mrp) * 100
-                else:
-                    discount_percentage = 0
+                total_mrp += mrp * quantity
+                total_amount += line_total
                 
-                item_total = quantity * sell_price
-                mrp_total = quantity * mrp
+                # Format product name
+                display_name = product_name[:18] if len(product_name) > 18 else product_name
                 
-                total_amount += item_total
-                total_mrp_amount += mrp_total
-                
-                # Format product name to fit compact layout
-                name_parts = []
-                # If product name has size info (numbers with ML, GM, KG, etc.), separate it
-                name_size_pattern = r'(.+?)(\d+\s*(?:ML|GM|G|KG|L))'
-                import re
-                match = re.search(name_size_pattern, product_name, re.IGNORECASE)
-                
-                # Extract product size if present
-                product_display = product_name
-                
-                # Format the product row to match the screenshot exactly
-                # This uses precise character positioning to ensure alignment
-                if len(product_display) > 20:
-                    # First line has product name truncated
-                    receipt += f"{product_display[:20]:<20}"
-                    
-                    # Format numbers with correct spacing - matching screenshot exactly
-                    receipt += f"{quantity:<3}{mrp:<4.0f}{discount_percentage:<3.0f}{sell_price:<5.0f}{' ':>5}{item_total:>5.0f}\n"
-                    
-                    # Second line for longer product names
-                    if len(product_display) > 20:
-                        receipt += f"{product_display[20:40]}\n"
-                else:
-                    # Everything fits on one line
-                    receipt += f"{product_display:<20}"
-                    
-                    # Format numbers with correct spacing - matching screenshot exactly
-                    receipt += f"{quantity:<3}{mrp:<4.0f}{discount_percentage:<3.0f}{sell_price:<5.0f}{' ':>5}{item_total:>5.0f}\n"
+                preview += f"{display_name:<20} {quantity:>3} {mrp:>5.0f} {unit_price:>5.0f} {line_total:>6.0f}\n"
             
-            total_savings = total_mrp_amount - total_amount
+            # Totals
+            savings = total_mrp - total_amount
+            savings_percent = (savings / total_mrp * 100) if total_mrp > 0 else 0
             
-            # Apply any additional discount from transaction
-            discount = float(first_row['Discount']) if first_row['Discount'] else 0
-            additional_discount_amount = total_amount * (discount / 100)
-            final_total = total_amount - additional_discount_amount
-            total_savings += additional_discount_amount
+            preview += "-" * 40 + "\n"
+            preview += f"SAVE RS {savings:.0f} ({savings_percent:.1f}%)\n"
+            preview += f"TOTAL RS: {total_mrp:.0f} → {total_amount:.0f}\n"
+            preview += "=" * 40 + "\n"
+            preview += "Thanks for visiting us!\n"
+            preview += "💡 Use 'Open in Browser' for full receipt view"
             
-            # Total section - formatted to match the screenshot exactly
-            receipt += f"{'-'*receipt_width}\n"
-            
-            # Only show discount if applicable
-            if additional_discount_amount > 0:
-                receipt += f"{'DISCOUNT ('+ str(discount) + '%):':<8}{'₹'}{additional_discount_amount:>8.2f}\n"
-                receipt += f"{'-'*receipt_width}\n"
-            
-            # TOTAL row with exact positioning as seen in screenshot
-            receipt += f"{'TOTAL:':<8}{'₹':<2}{final_total:>8.2f}\n"
-            receipt += f"{'-'*receipt_width}\n"
-            
-            # You saved message with exact positioning as seen in screenshot
-            if total_savings > 0:
-                receipt += f"{'You saved:':<8}{'₹':<2}{total_savings:>8.2f}\n"
-                receipt += f"{'-'*receipt_width}\n"
-            
-            # Add footer with thank you message
-            receipt += f"\n{center_text('Thank you for shopping!', receipt_width)}\n"
-            receipt += f"{center_text('Visit again soon!', receipt_width)}\n\n"
-            
-            # Add extra feed for printer cut
-            receipt += f"\n\n\n"
-            
-            return receipt
+            return preview
             
         except Exception as e:
-            return f"Error generating receipt: {str(e)}"
-            
-    def generate_pdf_receipt(self, receipt_text, output_path):
-        """
-        Generate a PDF receipt from the receipt text
-        
-        Args:
-            receipt_text: The formatted receipt text
-            output_path: The file path where the PDF will be saved
-            
-        Returns:
-            bool: True if successful, False otherwise
-        """
-        try:
-            from reportlab.lib.pagesizes import A4
-            from reportlab.lib import colors
-            from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-            from reportlab.lib.units import inch
-            from reportlab.pdfbase import pdfmetrics
-            from reportlab.pdfbase.ttfonts import TTFont
-            import os
-            
-            # Register a monospace font for better receipt formatting
-            try:
-                # Try to use Courier font which is commonly available
-                pdfmetrics.registerFont(TTFont('Courier', 'C:\\Windows\\Fonts\\cour.ttf'))
-                font_name = 'Courier'
-            except:
-                # Fall back to default
-                font_name = 'Courier'
-                
-            # Create PDF document
-            doc = SimpleDocTemplate(
-                output_path,
-                pagesize=A4,
-                rightMargin=72, 
-                leftMargin=72,
-                topMargin=72, 
-                bottomMargin=72
-            )
-            
-            # Create styles
-            styles = getSampleStyleSheet()
-            receipt_style = ParagraphStyle(
-                'Receipt',
-                fontName=font_name,
-                fontSize=10,
-                leading=12,
-                spaceAfter=10,
-                wordWrap='CJK',
-                alignment=0  # Left alignment
-            )
-            
-            # Process receipt text to maintain formatting in PDF
-            lines = receipt_text.split('\n')
-            story = []
-            
-            # Create a paragraph for each line to maintain formatting
-            for line in lines:
-                if line.strip():  # Skip empty lines
-                    p = Paragraph(f"<pre>{line}</pre>", receipt_style)
-                    story.append(p)
-                else:
-                    story.append(Spacer(1, 6))  # Add small space for empty lines
-            
-            # Build the PDF
-            doc.build(story)
-            
-            self.status_var.set(f"✅ PDF receipt created: {output_path}")
-            return True
-        
-        except ImportError:
-            self.status_var.set("Unable to create PDF - ReportLab library not installed")
-            messagebox.showwarning("PDF Error", "ReportLab library is not installed. Using text receipt instead.")
-            return False
-            
-        except Exception as e:
-            self.status_var.set(f"Error creating PDF: {str(e)}")
-            messagebox.showerror("PDF Error", f"Failed to create PDF receipt: {str(e)}")
-            return False
+            return f"Error generating preview: {str(e)}"
     
-    def send_to_printer(self, receipt_text):
-        """Send receipt to thermal printer"""
-        # Import libraries at top level to ensure availability throughout the method
-        import os
-        import tempfile
-        
-        # Initialize temp_file variables at the top level
-        txt_file = None
-        pdf_file = None
-        
+    def open_receipt_in_browser(self, transaction_id, generator):
+        """Open receipt in browser for preview/printing"""
         try:
-            # Try PDF printing first
-            pdf_file = os.path.join(tempfile.gettempdir(), f"receipt_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
-            if self.generate_pdf_receipt(receipt_text, pdf_file):
-                # Try to print the PDF file
-                try:
-                    # On Windows, PDF files can be printed with shell command
-                    print_result = os.system(f'start /min "" powershell -Command "Start-Process -FilePath \'{pdf_file}\' -Verb Print -PassThru | %{{sleep 2; $_.CloseMainWindow()}} | Out-Null"')
-                    if print_result == 0:
-                        self.status_var.set(f"✅ PDF receipt sent to printer")
-                        messagebox.showinfo("Print", "✅ PDF receipt sent to printer!")
-                        return True
-                except Exception as pdf_print_err:
-                    self.status_var.set(f"PDF print failed: {str(pdf_print_err)}")
-            
-            # If PDF printing failed, continue with regular thermal printer approach
-            
-            # Import necessary libraries
-            import win32print
-            import win32ui
-            import win32con
-            
-            # Create a temporary file for printing (useful for fallback)
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False, encoding='utf-8') as f:
-                f.write(receipt_text)
-                txt_file = f.name
-            
-            # List of possible thermal printer names
-            thermal_printer_keywords = ["TVS", "3200", "LITE", "THERMAL", "RECEIPT", "POS", "EPSON", "TM-"]
-            
-            # Try to find thermal printer specifically
-            printer_name = None
-            all_printers = []
-            
-            # Enumerate all printers and find the thermal printer
-            for p in win32print.EnumPrinters(win32print.PRINTER_ENUM_LOCAL):
-                printer_info = p[2].upper()
-                all_printers.append(printer_info)
-                
-                # Check if any of the thermal printer keywords match
-                if any(keyword in printer_info for keyword in thermal_printer_keywords):
-                    printer_name = p[2]
-                    self.status_var.set(f"Using printer: {printer_name}")
-                    break
-            
-            # If thermal printer not found, use default printer
-            if not printer_name:
-                printer_name = win32print.GetDefaultPrinter()
-                self.status_var.set(f"Thermal printer not found, using default: {printer_name}")
-                
-                # Log available printers for troubleshooting
-                print(f"Available printers: {all_printers}")
-                print(f"Using default printer: {printer_name}")
-            
-            # Create a DC for the printer
-            hprinter = win32print.OpenPrinter(printer_name)
-            printer_info = win32print.GetPrinter(hprinter, 2)
-            
-            # Set up printing parameters specific for thermal printers
-            hdc = win32ui.CreateDC()
-            hdc.CreatePrinterDC(printer_name)
-            hdc.StartDoc("BAUJI RECEIPT")  # Document name
-            hdc.StartPage()
-            
-            # Thermal printer settings - use smaller font and spacing
-            # MM_TWIPS is 1/1440 of an inch
-            hdc.SetMapMode(win32con.MM_TWIPS)
-            
-            # Font settings optimized for TVS 3200 Lite 3-inch thermal printer (based on actual receipt)
-            font = win32ui.CreateFont({
-                "name": "Courier New",     # Monospace font works best for thermal printers
-                "height": 90,              # Adjusted smaller for exact TVS 3200 Lite formatting
-                "weight": 400,             # Normal weight (not bold)
-                "pitch and family": 49,    # FIXED_PITCH | FF_MODERN
-                "quality": 3,              # DRAFT quality is faster for thermal printers
-                "width": 0,                # Default width  
-                "italic": 0,               # No italic
-                "underline": 0,            # No underline
-                "strike out": 0,           # No strikeout
-                "charset": 0,              # Default charset
-                "out precision": 3,        # Out precision for thermal printer
-                "clip precision": 2        # Clip precision for thermal printer
-            })
-            
-            # Select the font into the device context
-            old_font = hdc.SelectObject(font)
-            
-            # Format and print the receipt text line by line optimized for TVS 3200 Lite
-            y = 0
-            left_margin = 8    # Minimal left margin for TVS 3200 Lite (based on actual receipt)
-            line_spacing = 55  # Exact line spacing observed in TVS 3200 Lite output
-            
-            for line in receipt_text.split('\n'):
-                # Skip empty lines to save paper
-                if line.strip():
-                    hdc.TextOut(left_margin, y, line)
-                y += line_spacing
-            
-            # Restore the original font
-            hdc.SelectObject(old_font)
-            
-            # Finish printing
-            hdc.EndPage()
-            hdc.EndDoc()
-            hdc.DeleteDC()
-            win32print.ClosePrinter(hprinter)
-            
-            # Clean up temporary file
-            try:
-                if txt_file and os.path.exists(txt_file):
-                    os.unlink(txt_file)
-            except Exception:
-                # If we can't delete the temp file, it's not critical
-                pass
-            
-            self.status_var.set(f"✅ Receipt sent to printer: {printer_name}")
-            messagebox.showinfo("Print", f"✅ Receipt sent to printer: {printer_name}")
-            return True
-            
-        except ImportError:
-            # If win32print is not available, fall back to notepad printing
-            self.status_var.set("Falling back to Notepad printing (win32print not available)")
-            
-            try:
-                # Create temporary file if not already created
-                if not txt_file or not os.path.exists(txt_file):
-                    with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False, encoding='utf-8') as f:
-                        f.write(receipt_text)
-                        txt_file = f.name
-                
-                # Send to default printer using notepad
-                # Use /p switch for silent printing
-                print_result = os.system(f'notepad /p "{txt_file}"')
-                
-                # Check if the command was successful
-                if print_result == 0:
-                    messagebox.showinfo("Print", "✅ Receipt sent to printer using Notepad!")
-                    self.status_var.set("Receipt sent to printer using Notepad")
-                else:
-                    messagebox.showwarning("Print Warning", 
-                                         f"Notepad print command returned code {print_result}.\n"
-                                         f"Check if the printer is working correctly.")
-                    self.status_var.set(f"Notepad print warning: Return code {print_result}")
-                
-                # Clean up
-                try:
-                    if txt_file and os.path.exists(txt_file):
-                        os.unlink(txt_file)
-                except Exception:
-                    # Not critical if cleanup fails
-                    pass
-                    
-                return True
-                
-            except Exception as e:
-                self.status_var.set(f"Print error: {str(e)}")
-                messagebox.showerror("Print Error", f"Failed to print receipt: {str(e)}")
-                return False
-        
+            success = generator.preview_receipt(transaction_id)
+            if success:
+                messagebox.showinfo("Browser", "Receipt opened in browser for preview and printing!")
+            else:
+                messagebox.showerror("Error", "Failed to open receipt in browser")
         except Exception as e:
-            # Show detailed error for troubleshooting
-            error_msg = f"Failed to print receipt: {str(e)}"
-            self.status_var.set(error_msg)
+            messagebox.showerror("Error", f"Failed to open in browser: {str(e)}")
+    
+    def print_html_receipt(self, transaction_id, generator):
+        """Print HTML receipt"""
+        try:
+            success = generator.preview_receipt(transaction_id)
+            if success:
+                messagebox.showinfo("Print", 
+                    "Receipt opened in browser.\n\n"
+                    "To print:\n"
+                    "1. Use Ctrl+P in the browser\n"
+                    "2. Select your printer\n"
+                    "3. Choose 'More settings' → Paper size → Custom (3 inch)\n"
+                    "4. Click Print")
+            else:
+                messagebox.showerror("Error", "Failed to open receipt for printing")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to print receipt: {str(e)}")
+    
+    def save_html_receipt(self, transaction_id, html_content):
+        """Save HTML receipt to file"""
+        try:
+            # Create receipts directory if it doesn't exist
+            receipts_dir = "receipts"
+            os.makedirs(receipts_dir, exist_ok=True)
             
-            messagebox.showerror("Print Error", 
-                               f"{error_msg}\n\n"
-                               f"Please check:\n"
-                               f"1. Printer is connected and powered on\n"
-                               f"2. Paper is properly loaded\n"
-                               f"3. Printer driver is installed correctly\n"
-                               f"4. No pending print jobs\n\n"
-                               f"Try restarting the application or the printer.")
+            # Ask user for save location, defaulting to receipts folder
+            save_path = filedialog.asksaveasfilename(
+                defaultextension=".html",
+                filetypes=[("HTML files", "*.html"), ("All files", "*.*")],
+                initialdir=receipts_dir,
+                initialfile=f"Receipt_{transaction_id}.html",
+                title="Save Receipt HTML"
+            )
             
-            # Try alternative direct printing method
-            try:
-                response = messagebox.askyesno("Fallback Options", 
-                                             "Would you like to try alternative printing methods?")
-                if response:
-                    # Try direct printing method first
-                    try:
-                        # Direct raw printing to printer (works well with thermal printers)
-                        hPrinter = win32print.OpenPrinter(printer_name)
-                        try:
-                            hJob = win32print.StartDocPrinter(hPrinter, 1, ("Receipt", None, "RAW"))
-                            try:
-                                win32print.StartPagePrinter(hPrinter)
-                                # Add printer initialization codes specifically for TVS 3200 Lite
-                                # ESC @ - Initialize printer
-                                # ESC ! 0 - Normal text mode
-                                # ESC t 19 - Set code page for Indian rupee symbol and other characters
-                                init_codes = b'\x1b@\x1b!0\x1bt\x13'
-                                
-                                # Replace Unicode rupee with printer-specific code if needed
-                                receipt_bytes = receipt_text.replace('₹', 'Rs.').encode('ascii', 'replace')
-                                
-                                win32print.WritePrinter(hPrinter, init_codes)
-                                win32print.WritePrinter(hPrinter, receipt_bytes)
-                                win32print.EndPagePrinter(hPrinter)
-                            finally:
-                                win32print.EndDocPrinter(hPrinter)
-                        finally:
-                            win32print.ClosePrinter(hPrinter)
-                            
-                        messagebox.showinfo("Print", "✅ Used direct printing method successfully")
-                        self.status_var.set("Used direct printing method")
-                        return True
-                    except Exception as direct_err:
-                        # If direct printing failed, try notepad
-                        print(f"Direct printing error: {direct_err}")
-                        response = messagebox.askyesno("Notepad Fallback", 
-                                                     "Direct printing failed. Try via Notepad?")
-                        if response and txt_file and os.path.exists(txt_file):
-                            os.system(f'notepad /p "{txt_file}"')
-                            self.status_var.set("Used Notepad fallback for printing")
-                            return True
-                        elif response and pdf_file and os.path.exists(pdf_file):
-                            # Try with the PDF file as a last resort
-                            os.system(f'start "" "{pdf_file}"')
-                            self.status_var.set("Opened PDF receipt for manual printing")
-                            return True
-            except Exception:
-                pass
-            
-            return False
+            if save_path:
+                with open(save_path, 'w', encoding='utf-8') as f:
+                    f.write(html_content)
+                
+                messagebox.showinfo("Saved", f"Receipt saved to:\n{save_path}")
+                
+                # Ask if user wants to open the saved file
+                if messagebox.askyesno("Open File", "Would you like to open the saved receipt?"):
+                    import os
+                    os.startfile(save_path)
+                    
+        except Exception as e:
+            messagebox.showerror("Save Error", f"Failed to save receipt: {str(e)}")
+    
+    # Old text/PDF receipt methods removed - now using HTML receipts
+    # Old text/PDF receipt methods removed - now using HTML receipts
+    # Old thermal printer methods removed - now using HTML receipts with browser printing
     
     # Transaction History Functions
     def load_transaction_history(self):

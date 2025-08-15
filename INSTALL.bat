@@ -56,6 +56,7 @@ echo.
 echo [3/5] Creating data directories...
 if not exist "data" mkdir data
 if not exist "backups" mkdir backups
+if not exist "receipts" mkdir receipts
 echo ✅ Data directories created
 
 echo.
@@ -109,9 +110,17 @@ echo    • Or run: python shop_gui.py
 echo.
 echo 📁 Important files:
 echo    • shop_gui.py           - Main application
+echo    • html_receipt_generator.py - HTML receipt system
 echo    • inventory_master.csv  - Your product database
 echo    • data\                 - Customer and transaction data
 echo    • backups\              - Automatic backups
+echo    • receipts\             - Generated HTML receipts
+echo.
+echo 💡 New Features:
+echo    ✅ HTML-based receipts with UPI QR codes
+echo    ✅ Browser-based printing for thermal printers
+echo    ✅ Professional invoice format
+echo    ✅ Automatic receipt archiving
 echo.
 echo 🛠️  Utilities:
 echo    • rebuild_customers.py  - Rebuild customer database

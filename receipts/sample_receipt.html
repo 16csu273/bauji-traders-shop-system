@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sample Invoice - 3 Inch</title>
+  <style>
+    body {
+      width: 2.8in;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 11px;
+      margin: 0;
+      padding: 0.2in 0.1in;
+      background: #fff;
+      color: #222;
+    }
+    .center { text-align: center; }
+    .bold { font-weight: bold; }
+    .shop-info, .customer-info, .footer { margin-bottom: 8px; }
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 8px;
+    }
+    .invoice-table th, .invoice-table td {
+      padding: 2px 3px;
+      text-align: left;
+      font-size: 10px;
+    }
+    .invoice-table th {
+      border-bottom: 1px solid #aaa;
+      font-weight: bold;
+      background: #f5f5f5;
+    }
+    .invoice-table td {
+      border-bottom: 1px dotted #ddd;
+      white-space: nowrap;
+    }
+    .right { text-align: right; }
+    .total-row td {
+      border-top: 1px solid #aaa;
+      font-weight: bold;
+      background: #f5f5f5;
+    }
+    .save-row td {
+      color: #388e3c;
+      font-weight: bold;
+      border: none;
+      background: #e8f5e9;
+    }
+    .footer {
+      border-top: 1px dashed #aaa;
+      padding-top: 6px;
+      font-size: 10px;
+      text-align: center;
+    }
+    .qr-section {
+      text-align: center;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed #aaa;
+    }
+    .qr-code {
+      width: 80px;
+      height: 80px;
+      margin: 5px auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="shop-info center bold">
+    M/s SHRI BAUJI TRADERS<br>
+    1690 30FT ROAD<br>
+    JAWAHAR COLONY NIT FARIDABAD<br>
+    State: 07<br>
+    PH: 9911148114, 9555269666
+  </div>
+  <div class="customer-info">
+    <div>Date/Time: <span id="datetime"></span></div>
+    <div>Customer: Puneet</div>
+    <div>Phone: 9911108114</div>
+    <div>Payment: Cash</div>
+  </div>
+  <table class="invoice-table">
+    <tr>
+      <th style="width: 1.1in;">Item</th>
+      <th class="right" style="width: 0.3in;">Qty</th>
+      <th class="right" style="width: 0.4in;">MRP</th>
+      <th class="right" style="width: 0.4in;">Dis%</th>
+      <th class="right" style="width: 0.4in;">Rate</th>
+      <th class="right" style="width: 0.5in;">Total</th>
+    </tr>
+    <tr>
+      <td>ALMOND DROP OIL<br><span style="font-size:9px;">200ML</span></td>
+      <td class="right">1</td>
+      <td class="right">150</td>
+      <td class="right">12</td>
+      <td class="right">132</td>
+      <td class="right">132</td>
+    </tr>
+    <tr>
+      <td>CHERRY LIQUID</td>
+      <td class="right">2</td>
+      <td class="right">132</td>
+      <td class="right">9.3</td>
+      <td class="right">123</td>
+      <td class="right">246</td>
+    </tr>
+    <tr class="save-row">
+      <td colspan="6">SAVE RS 36 (8.6%)</td>
+    </tr>
+    <tr class="total-row">
+      <td colspan="5" class="right">TOTAL RS</td>
+      <td class="right">378</td>
+    </tr>
+  </table>
+  <div class="footer">
+    Thanks for visiting us, come back soon!
+  </div>
+  <div class="qr-section">
+    <div style="font-size: 10px; font-weight: bold; margin-bottom: 3px;">Pay with UPI</div>
+    <img class="qr-code" id="qrcode" alt="UPI QR Code" />
+    <div style="font-size: 9px; color: #666; margin-top: 3px;">Scan to pay ₹378</div>
+  </div>
+  <script>
+    // Set current date and time
+    document.getElementById('datetime').textContent = new Date().toLocaleString();
+    
+    // Generate UPI QR Code
+    // Replace with your actual UPI ID
+    const upiId = "9911148114@paytm"; // or your preferred UPI ID
+    const amount = "378";
+    const merchantName = "SHRI BAUJI TRADERS";
+    
+    // UPI payment URL format
+    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent('Payment for Invoice')}`;
+    
+    // Generate QR code using qr-server.com API
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(upiUrl)}`;
+    
+    // Set QR code image source
+    document.getElementById('qrcode').src = qrCodeUrl;
+  </script>
+</body>
+</html>

@@ -1,8 +1,8 @@
-# BAUJI TRADERS - Shop Management System v2.0
+# BAUJI TRADERS - Shop Management System v2.1
 
 ## 🏪 Complete Shop Management Solution
 
-A professional-grade shop management system with barcode scanning, inventory management, customer database, and thermal receipt printing.
+A professional-grade shop management system with barcode scanning, inventory management, customer database, and HTML receipt generation with UPI QR codes.
 
 ---
 
@@ -28,6 +28,9 @@ A professional-grade shop management system with barcode scanning, inventory man
 ### 💳 Billing & Sales
 - **Lightning-fast barcode scanning** - Auto-add products with quantity increment
 - **Manual product selection** - Browse and add products with custom quantity
+- **HTML Receipt Generation** - Professional invoices with UPI QR codes
+- **Browser-based printing** - Perfect for thermal printers
+- **Receipt archiving** - Auto-save to receipts folder
 - **Editable shopping cart** - Double-click to edit quantity and price
 - **Multiple payment methods** - Cash, Card, UPI support
 - **Discount management** - Apply percentage discounts

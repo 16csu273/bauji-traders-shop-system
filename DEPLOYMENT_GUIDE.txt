@@ -1,0 +1,91 @@
+# BAUJI TRADERS - DEPLOYMENT GUIDE v2.1
+# ===============================================
+
+## 📦 WHAT'S NEW IN v2.1
+
+✅ **HTML Receipt System**
+   - Professional invoice-style receipts
+   - UPI QR codes with your account details (9911108114@ybl - Puneet Verma)
+   - Browser-based printing for thermal printers
+   - Auto-save receipts to receipts/ folder
+
+✅ **Enhanced Features**
+   - Correct sell price calculations (cost_price + 40% of profit margin)
+   - **ALWAYS ROUND UP** pricing (9.07 → ₹10, not ₹9)
+   - Better product name formatting
+   - Improved savings percentage calculations
+   - Clean file organization
+
+## 🎯 DEPLOYMENT STEPS
+
+### 1. Copy to Shop PC
+- Copy entire folder to shop computer
+- Maintain folder structure exactly as provided
+
+### 2. Run Installation  
+- Double-click "INSTALL.bat"
+- Wait for all packages to install
+- Installation will create:
+  * data/ folder (customer and transaction data)
+  * backups/ folder (automatic backups)
+  * receipts/ folder (HTML receipts)
+
+### 3. Launch Application
+- Double-click "LAUNCH_SHOP.bat"
+- System ready for use!
+
+## 📁 FOLDER STRUCTURE
+
+```
+bauji-traders-shop-system/
+├── shop_gui.py                 # Main application
+├── html_receipt_generator.py   # Receipt generator
+├── inventory_master.csv        # Your products
+├── INSTALL.bat                 # Installation script
+├── LAUNCH_SHOP.bat            # Launch script
+├── data/                      # Transaction & customer data
+├── backups/                   # Automatic backups
+├── receipts/                  # Generated receipts
+└── README.md                  # Full documentation
+```
+
+## 🔧 SYSTEM REQUIREMENTS
+
+- Windows 7/8/10/11
+- Python 3.6+ (auto-installed if missing)
+- 100MB free disk space
+- Internet connection (for UPI QR codes)
+
+## 💡 USAGE TIPS
+
+### Receipt System
+- All receipts generate as HTML files
+- Receipts open in browser for printing
+- UPI QR codes work with any UPI app
+- Receipts auto-saved to receipts/ folder
+
+### Backup & Recovery
+- Daily backups created automatically
+- Use restore_inventory_and_clear_transactions.py to reset
+- Customer data backed up before any major operations
+
+## 🆘 TROUBLESHOOTING
+
+**Issue**: Receipt shows wrong prices
+**Fix**: Check inventory_master.csv has correct Cost_Price and MRP values
+
+**Issue**: UPI QR code not working  
+**Fix**: Check internet connection, QR codes generated online
+
+**Issue**: Python not found
+**Fix**: Re-run INSTALL.bat, ensure Python added to PATH
+
+## 📞 SUPPORT
+
+For any issues or customizations needed, reference the original conversation
+or check the detailed README.md file included in the system.
+
+---
+Generated: August 15, 2025
+System Version: v2.1 (HTML Receipt Update)
+UPI Account: 9911108114@ybl (Puneet Verma)
