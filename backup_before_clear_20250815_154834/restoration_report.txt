@@ -1,0 +1,9 @@
+🔄 INVENTORY RESTORATION REPORT
+==================================================
+Date: 2025-08-15 15:48:38
+Products Restored: 1
+Total Transactions Cleared: 1
+
+DETAILED RESTORATION:
+--------------------------------------------------
+PARLE HIDE & SEEK 10/-                   | Qty:    1 | Revenue: ₹      10

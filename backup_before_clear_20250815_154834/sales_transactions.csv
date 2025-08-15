@@ -1,1 +1,2 @@
 Transaction_ID,Date,Time,Customer_Name,Customer_Phone,Product_Name,Quantity_Sold,Unit_Price,Total_Amount,Payment_Method,Discount,Final_Amount
+TXN20250815154757,2025-08-15,15:47:57,karan,9911108114,PARLE HIDE & SEEK 10/-,1,10,10,Cash,0.0,10.0

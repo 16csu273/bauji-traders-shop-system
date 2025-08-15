@@ -1,0 +1,16 @@
+🔄 INVENTORY RESTORATION REPORT
+==================================================
+Date: 2025-08-15 15:42:36
+Products Restored: 8
+Total Transactions Cleared: 8
+
+DETAILED RESTORATION:
+--------------------------------------------------
+5 STAR CHOCOLATE 10/-                    | Qty:    2 | Revenue: ₹      20
+5 STAR CHOCOLATE 5/-                     | Qty:    2 | Revenue: ₹      10
+ALL OUT MACHINE 105/-                    | Qty:    2 | Revenue: ₹     184
+BIKA JI ALL IN ONE 200G                  | Qty:    1 | Revenue: ₹      48
+CLINIC SHAMPOO 100ML                     | Qty:    2 | Revenue: ₹     106
+GARNIER F.W DOUBLE ACTION 50ML           | Qty:    1 | Revenue: ₹     106
+GINGER GARLIC PESTE 5                    | Qty:    2 | Revenue: ₹     106
+KISSAN JAM 500GM 200/-                   | Qty:    1 | Revenue: ₹     106

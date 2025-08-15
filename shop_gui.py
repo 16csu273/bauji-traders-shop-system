@@ -1944,26 +1944,29 @@ class BaujiTradersGUI:
                 self.refresh_all_data()
                 
                 # Handle different actions
-                if checkout_dialog.action == 'save_print':
-                    # Direct print without asking
-                    self.print_receipt(transaction_id, direct_print=True)
+                if checkout_dialog.action == 'direct_print':
+                    # Direct print without any preview - fastest checkout
+                    self.direct_print_receipt(transaction_id)
                     messagebox.showinfo("Success", 
-                                      f"✅ Sale completed and receipt printed!\n"
+                                      f"✅ Sale completed and sent to printer!\n"
                                       f"Transaction ID: {transaction_id}\n"
                                       f"Customer: {customer_info['name']}\n"
                                       f"Total Amount: ₹{final_amount:.2f}")
                 
-                elif checkout_dialog.action == 'show_receipt':
-                    # Show success message first
+                elif checkout_dialog.action == 'preview_receipt':
+                    # Preview receipt with print option
+                    self.preview_receipt_with_print(transaction_id, customer_info, final_amount)
+                
+                elif checkout_dialog.action == 'save_show':
+                    # Show receipt in preview window (current behavior)
                     messagebox.showinfo("Success", 
                                       f"✅ Sale completed successfully!\n"
                                       f"Transaction ID: {transaction_id}\n"
                                       f"Customer: {customer_info['name']}\n"
                                       f"Total Amount: ₹{final_amount:.2f}")
                     
-                    # Then ask to print receipt (current behavior)
-                    if messagebox.askyesno("Print Receipt", "Would you like to print receipt?"):
-                        self.print_receipt(transaction_id)
+                    # Show receipt preview window
+                    self.print_receipt(transaction_id)
                     
             else:
                 messagebox.showerror("Error", f"Sale failed: {result['message']}")
@@ -2319,6 +2322,154 @@ class BaujiTradersGUI:
                     
         except Exception as e:
             messagebox.showerror("Save Error", f"Failed to save receipt: {str(e)}")
+    
+    def direct_print_receipt(self, transaction_id):
+        """Direct print receipt without preview - automatically opens in browser for printing"""
+        try:
+            # Import our HTML receipt generator
+            from html_receipt_generator import HTMLReceiptGenerator
+            import tempfile
+            import webbrowser
+            import threading
+            import time
+            
+            # Initialize generator
+            generator = HTMLReceiptGenerator(self.shop_manager.sales_file, self.shop_manager.inventory_file)
+            
+            # Generate HTML receipt
+            html_content, error = generator.generate_receipt_html(transaction_id)
+            
+            if error:
+                messagebox.showerror("Error", f"Failed to generate receipt: {error}")
+                return
+            
+            # Save to temporary file
+            temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False, encoding='utf-8')
+            temp_file.write(html_content)
+            temp_file.close()
+            
+            # Open in browser
+            webbrowser.open(f'file://{temp_file.name}')
+            
+            # Auto-trigger print dialog after a brief delay (works in most browsers)
+            def trigger_print():
+                time.sleep(2)  # Wait for page to load
+                try:
+                    # This will work with JavaScript in the browser
+                    import pyautogui
+                    pyautogui.hotkey('ctrl', 'p')  # Trigger print dialog
+                except ImportError:
+                    pass  # pyautogui not available, user will need to print manually
+            
+            # Start print trigger in background
+            threading.Thread(target=trigger_print, daemon=True).start()
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to print receipt: {str(e)}")
+    
+    def preview_receipt_with_print(self, transaction_id, customer_info, final_amount):
+        """Preview receipt with prominent print button"""
+        try:
+            # Import our HTML receipt generator
+            from html_receipt_generator import HTMLReceiptGenerator
+            
+            # Initialize generator
+            generator = HTMLReceiptGenerator(self.shop_manager.sales_file, self.shop_manager.inventory_file)
+            
+            # Generate HTML receipt
+            html_content, error = generator.generate_receipt_html(transaction_id)
+            
+            if error:
+                messagebox.showerror("Error", f"Failed to generate receipt: {error}")
+                return
+            
+            # Create preview window with print focus
+            self.show_receipt_preview_with_print(transaction_id, html_content, generator, customer_info, final_amount)
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to preview receipt: {str(e)}")
+    
+    def show_receipt_preview_with_print(self, transaction_id, html_content, generator, customer_info, final_amount):
+        """Show receipt preview window with prominent print button"""
+        try:
+            import tempfile
+            import webbrowser
+            
+            # Create receipt preview window
+            receipt_window = tk.Toplevel(self.root)
+            receipt_window.title("🧾 Receipt Preview & Print")
+            receipt_window.geometry("600x750")
+            receipt_window.transient(self.root)
+            receipt_window.grab_set()
+            
+            # Header frame with success message
+            header_frame = ttk.Frame(receipt_window)
+            header_frame.pack(fill=tk.X, padx=10, pady=10)
+            
+            ttk.Label(header_frame, text="✅ Sale Completed Successfully!", 
+                     font=("Arial", 14, "bold"), foreground="green").pack()
+            ttk.Label(header_frame, text=f"Transaction ID: {transaction_id}", 
+                     font=("Arial", 10)).pack()
+            ttk.Label(header_frame, text=f"Customer: {customer_info['name']}", 
+                     font=("Arial", 10)).pack()
+            ttk.Label(header_frame, text=f"Total Amount: ₹{final_amount:.2f}", 
+                     font=("Arial", 10, "bold"), foreground="blue").pack()
+            
+            # Button frame - Print button is prominent
+            button_frame = ttk.Frame(receipt_window)
+            button_frame.pack(fill=tk.X, padx=10, pady=10)
+            
+            # Prominent Print button
+            print_btn = ttk.Button(button_frame, text="🖨️ PRINT RECEIPT", 
+                                 command=lambda: self.print_html_receipt(transaction_id, generator),
+                                 style="PrintButton.TButton")
+            print_btn.pack(side=tk.LEFT, padx=5)
+            
+            # Other buttons
+            ttk.Button(button_frame, text="🌐 Open in Browser", 
+                     command=lambda: self.open_receipt_in_browser(transaction_id, generator)).pack(side=tk.LEFT, padx=5)
+            
+            ttk.Button(button_frame, text="💾 Save Receipt", 
+                     command=lambda: self.save_html_receipt(transaction_id, html_content)).pack(side=tk.LEFT, padx=5)
+            
+            ttk.Button(button_frame, text="❌ Close", 
+                     command=receipt_window.destroy).pack(side=tk.RIGHT, padx=5)
+            
+            # Configure print button style
+            style = ttk.Style()
+            style.configure("PrintButton.TButton", 
+                           font=("Arial", 10, "bold"))
+            
+            # Preview frame
+            preview_frame = ttk.LabelFrame(receipt_window, text="Receipt Preview")
+            preview_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+            
+            # Text preview
+            text_widget = tk.Text(preview_frame, wrap=tk.WORD, font=("Courier", 9))
+            scrollbar = ttk.Scrollbar(preview_frame, orient=tk.VERTICAL, command=text_widget.yview)
+            text_widget.configure(yscrollcommand=scrollbar.set)
+            
+            text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # Insert preview text
+            preview_text = self.extract_receipt_preview_text(transaction_id)
+            text_widget.insert(tk.END, preview_text)
+            text_widget.config(state=tk.DISABLED)
+            
+            # Info frame
+            info_frame = ttk.Frame(receipt_window)
+            info_frame.pack(fill=tk.X, padx=10, pady=5)
+            
+            ttk.Label(info_frame, text="💡 Click 'PRINT RECEIPT' for best quality printing with QR code", 
+                     font=("Arial", 9), foreground="blue").pack()
+            
+            # Auto-focus print button and bind Enter key
+            print_btn.focus_set()
+            receipt_window.bind('<Return>', lambda e: self.print_html_receipt(transaction_id, generator))
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to create preview window: {str(e)}")
     
     # Old text/PDF receipt methods removed - now using HTML receipts
     # Old text/PDF receipt methods removed - now using HTML receipts
@@ -3728,7 +3879,7 @@ class CheckoutDialog:
     def __init__(self, parent, title, cart_total):
         self.dialog = tk.Toplevel(parent)
         self.dialog.title(title)
-        self.dialog.geometry("450x300")
+        self.dialog.geometry("500x350")
         self.dialog.transient(parent)
         self.dialog.grab_set()
         
@@ -3774,32 +3925,35 @@ class CheckoutDialog:
         button_frame = ttk.Frame(self.dialog)
         button_frame.grid(row=2, column=0, columnspan=2, pady=20)
         
-        # Save & Print Receipt button (prominent)
-        save_print_btn = ttk.Button(button_frame, text="💾 Save & Print Receipt", 
-                                   command=self.save_and_print, 
-                                   style="SavePrint.TButton")
-        save_print_btn.pack(side=tk.LEFT, padx=5)
+        # Direct Print button (prominent - auto print)
+        direct_print_btn = tk.Button(button_frame, text="DIRECT PRINT",
+                                    font=("Arial", 10, "bold"),
+                                    bg="darkblue", fg="white",
+                                    activebackground="blue", activeforeground="white",
+                                    relief="raised", bd=2, 
+                                     command=self.direct_print)
+        direct_print_btn.pack(side=tk.LEFT, padx=5)
         
-        # Show Receipt button
-        show_receipt_btn = ttk.Button(button_frame, text="👁️ Show Receipt", 
-                                     command=self.show_receipt)
-        show_receipt_btn.pack(side=tk.LEFT, padx=5)
+        # Preview Receipt button
+        preview_btn = ttk.Button(button_frame, text="👁️ Preview Receipt", 
+                                command=self.preview_receipt)
+        preview_btn.pack(side=tk.LEFT, padx=5)
+        
+        # Save & Show Receipt button
+        save_show_btn = ttk.Button(button_frame, text="💾 Save & Show", 
+                                  command=self.save_and_show)
+        save_show_btn.pack(side=tk.LEFT, padx=5)
         
         # Cancel button
         cancel_btn = ttk.Button(button_frame, text="❌ Cancel", 
                                command=self.cancel)
         cancel_btn.pack(side=tk.LEFT, padx=5)
         
-        # Configure style for save & print button
-        style = ttk.Style()
-        style.configure("SavePrint.TButton", 
-                       font=("Arial", 9, "bold"))
-        
-        # Bind Enter key to save & print for quick checkout
-        self.dialog.bind('<Return>', lambda e: self.save_and_print())
+        # Bind Enter key to direct print for fastest checkout
+        self.dialog.bind('<Return>', lambda e: self.direct_print())
     
-    def save_and_print(self):
-        """Save transaction and print receipt directly"""
+    def direct_print(self):
+        """Save transaction and print receipt directly without preview"""
         if not self.name_var.get().strip():
             messagebox.showerror("Error", "Customer name is required")
             return
@@ -3809,11 +3963,11 @@ class CheckoutDialog:
             'phone': self.phone_var.get().strip(),
             'email': self.email_var.get().strip()
         }
-        self.action = 'save_print'
+        self.action = 'direct_print'
         self.dialog.destroy()
     
-    def show_receipt(self):
-        """Save transaction and show receipt preview"""
+    def preview_receipt(self):
+        """Preview receipt before printing"""
         if not self.name_var.get().strip():
             messagebox.showerror("Error", "Customer name is required")
             return
@@ -3823,7 +3977,21 @@ class CheckoutDialog:
             'phone': self.phone_var.get().strip(),
             'email': self.email_var.get().strip()
         }
-        self.action = 'show_receipt'
+        self.action = 'preview_receipt'
+        self.dialog.destroy()
+    
+    def save_and_show(self):
+        """Save transaction and show receipt in preview window"""
+        if not self.name_var.get().strip():
+            messagebox.showerror("Error", "Customer name is required")
+            return
+        
+        self.result = {
+            'name': self.name_var.get().strip(),
+            'phone': self.phone_var.get().strip(),
+            'email': self.email_var.get().strip()
+        }
+        self.action = 'save_show'
         self.dialog.destroy()
     
     def cancel(self):
