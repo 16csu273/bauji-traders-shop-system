@@ -2324,7 +2324,7 @@ class BaujiTradersGUI:
             messagebox.showerror("Save Error", f"Failed to save receipt: {str(e)}")
     
     def direct_print_receipt(self, transaction_id):
-        """Direct print receipt without preview - automatically opens in browser for printing"""
+        """Direct print receipt without preview - automatically opens in browser and triggers print"""
         try:
             # Import our HTML receipt generator
             from html_receipt_generator import HTMLReceiptGenerator
@@ -2336,12 +2336,31 @@ class BaujiTradersGUI:
             # Initialize generator
             generator = HTMLReceiptGenerator(self.shop_manager.sales_file, self.shop_manager.inventory_file)
             
-            # Generate HTML receipt
+            # Generate HTML receipt with auto-print JavaScript
             html_content, error = generator.generate_receipt_html(transaction_id)
             
             if error:
                 messagebox.showerror("Error", f"Failed to generate receipt: {error}")
                 return
+            
+            # Add auto-print JavaScript to the HTML
+            auto_print_script = """
+            <script>
+                window.onload = function() {
+                    // Wait a moment for the page to fully load
+                    setTimeout(function() {
+                        window.print();
+                    }, 1000);
+                };
+            </script>
+            """
+            
+            # Insert the script before the closing </body> tag
+            if "</body>" in html_content:
+                html_content = html_content.replace("</body>", auto_print_script + "</body>")
+            else:
+                # If no body tag, add at the end
+                html_content += auto_print_script
             
             # Save to temporary file
             temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False, encoding='utf-8')
@@ -2351,18 +2370,22 @@ class BaujiTradersGUI:
             # Open in browser
             webbrowser.open(f'file://{temp_file.name}')
             
-            # Auto-trigger print dialog after a brief delay (works in most browsers)
-            def trigger_print():
-                time.sleep(2)  # Wait for page to load
+            # Backup method: Use pyautogui as fallback
+            def trigger_print_fallback():
+                time.sleep(3)  # Wait for page to load
                 try:
-                    # This will work with JavaScript in the browser
                     import pyautogui
+                    # Check if pyautogui is available and working
+                    pyautogui.FAILSAFE = False  # Disable failsafe for automation
                     pyautogui.hotkey('ctrl', 'p')  # Trigger print dialog
+                    print("Print dialog triggered via Ctrl+P")
                 except ImportError:
-                    pass  # pyautogui not available, user will need to print manually
+                    print("pyautogui not available - using JavaScript auto-print only")
+                except Exception as e:
+                    print(f"Failed to trigger print with pyautogui: {e}")
             
-            # Start print trigger in background
-            threading.Thread(target=trigger_print, daemon=True).start()
+            # Start print trigger in background as fallback
+            threading.Thread(target=trigger_print_fallback, daemon=True).start()
             
         except Exception as e:
             messagebox.showerror("Error", f"Failed to print receipt: {str(e)}")
