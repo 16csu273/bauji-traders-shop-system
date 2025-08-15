@@ -9,11 +9,43 @@ import os
 from datetime import datetime
 import webbrowser
 import tempfile
+import qrcode
+import base64
+from io import BytesIO
 
 class HTMLReceiptGenerator:
     def __init__(self, sales_file, inventory_file):
         self.sales_file = sales_file
         self.inventory_file = inventory_file
+    
+    def generate_qr_code_base64(self, upi_id, amount, merchant_name):
+        """Generate QR code as base64 encoded image"""
+        try:
+            # Create UPI payment URL
+            upi_url = f"upi://pay?pa={upi_id}&pn={merchant_name}&am={amount}&cu=INR&tn=Payment to {merchant_name}"
+            
+            # Create QR code
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_M,
+                box_size=8,
+                border=1,
+            )
+            qr.add_data(upi_url)
+            qr.make(fit=True)
+            
+            # Create QR code image
+            qr_img = qr.make_image(fill_color="black", back_color="white")
+            
+            # Convert to base64
+            buffer = BytesIO()
+            qr_img.save(buffer, format='PNG')
+            img_str = base64.b64encode(buffer.getvalue()).decode()
+            
+            return f"data:image/png;base64,{img_str}"
+        except Exception as e:
+            print(f"Error generating QR code: {e}")
+            return None
         
     def generate_receipt_html(self, transaction_id):
         """Generate HTML receipt for a given transaction ID"""
@@ -152,6 +184,14 @@ class HTMLReceiptGenerator:
             html_content = html_content.replace('{{UPI_AMOUNT}}', f"{upi_amount:.0f}")
             html_content = html_content.replace('{{TOTAL_AMOUNT}}', f"{upi_amount:.0f}")
             
+            # Generate QR code for UPI payment
+            qr_code_base64 = self.generate_qr_code_base64("9911148114@pthdfc", f"{upi_amount:.0f}", "Shri Bauji Traders")
+            if qr_code_base64:
+                html_content = html_content.replace('{{QR_CODE_SRC}}', qr_code_base64)
+            else:
+                # Fallback to placeholder if QR generation fails
+                html_content = html_content.replace('{{QR_CODE_SRC}}', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
+            
             return html_content, None
             
         except Exception as e:
@@ -216,7 +256,8 @@ class HTMLReceiptGenerator:
     .footer {
       border-top: 1px dashed #aaa;
       padding-top: 6px;
-      font-size: 10px;
+      font-size: 14px;
+      font-weight: bold;
       text-align: center;
     }
     .qr-section {
@@ -226,10 +267,11 @@ class HTMLReceiptGenerator:
       border-top: 1px dashed #aaa;
     }
     .qr-code {
-      width: 80px;
-      height: 80px;
+      width: 120px;
+      height: 120px;
       margin: 5px auto;
       display: block;
+      filter: contrast(1.5) brightness(0.8);
     }
     @media print {
       body { margin: 0; padding: 0.1in; }
@@ -266,41 +308,21 @@ class HTMLReceiptGenerator:
     </tr>
     <tr class="total-row">
       <td colspan="5" class="right">TOTAL RS</td>
-      <td class="right"><span style="text-decoration: line-through; color: #999; font-size: 10px;">{{TOTAL_MRP}}</span> {{FINAL_TOTAL}}</td>
+      <td class="right"><span style="text-decoration: line-through; text-decoration-color: #000; text-decoration-thickness: 2px; color: #000; font-size: 15px;">{{TOTAL_MRP}}</span> <span style="font-size: 15px;">{{FINAL_TOTAL}}</span></td>
     </tr>
   </table>
   <div class="footer">
     Thanks for visiting us, come back soon!
   </div>
   <div class="qr-section">
-    <div style="font-size: 10px; font-weight: bold; margin-bottom: 3px;">Pay with UPI</div>
-    <img class="qr-code" id="qrcode" alt="UPI QR Code" />
-    <div style="font-size: 8px; color: #333; margin-top: 3px; line-height: 1.2;">
-      <div>UPI ID: 9911148114@pthdfc</div>
-      <div>Payee: Shri Bauji Traders</div>
-      <div style="font-weight: bold;">Amount: ₹{{UPI_AMOUNT}}</div>
+    <div style="font-size: 12px; font-weight: bold; margin-bottom: 5px;">Pay with UPI</div>
+    <img class="qr-code" src="{{QR_CODE_SRC}}" alt="UPI QR Code" />
+    <div style="font-size: 11px; color: #333; margin-top: 5px; line-height: 1.3; font-weight: bold;">
+      <div style="font-weight: bold;">UPI ID: 9911148114@pthdfc</div>
+      <div style="font-weight: bold;">Payee: Shri Bauji Traders</div>
+      <div style="font-weight: bold; font-size: 12px;">Amount: ₹{{UPI_AMOUNT}}</div>
     </div>
   </div>
-  <script>
-    // Generate UPI QR Code - Shri Bauji Traders's UPI Details
-    const upiId = "9911148114@pthdfc";
-    let amount = "{{UPI_AMOUNT}}";
-    const merchantName = "Shri Bauji Traders";
-    
-    // Validate amount to prevent NaN
-    if (!amount || amount === "nan" || amount === "NaN" || isNaN(parseFloat(amount))) {
-      amount = "0";
-    }
-    
-    // UPI payment URL format
-    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent('Payment to Bauji Traders')}`;
-    
-    // Generate QR code using qr-server.com API
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-/?size=80x80&data=${encodeURIComponent(upiUrl)}`;
-    
-    // Set QR code image source
-    document.getElementById('qrcode').src = qrCodeUrl;
-  </script>
 </body>
 </html>"""
     
