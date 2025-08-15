@@ -58,5 +58,34 @@
     },
     "deleted_at": "2025-08-14 17:16:35",
     "deleted_by": "Admin"
+  },
+  "PATANJALI DET  POPULAR 1KG": {
+    "product_data": {
+      "Sr_No": 314,
+      "Product_Name": "PATANJALI DET  POPULAR 1KG",
+      "Quantity": 10,
+      "Unit": NaN,
+      "MRP": 70.0,
+      "Purchase_Rate": NaN,
+      "Amount": NaN,
+      "Category": NaN,
+      "Cost_Price": 63.51,
+      "Actual_Margin_Percent": 10.21886317,
+      "Actual_Profit_Per_Unit": NaN,
+      "Total_Actual_Profit": NaN,
+      "SP_5_Percent": 66.5,
+      "SP_10_Percent": 63.0,
+      "SP_5_Margin_Percent": NaN,
+      "SP_10_Margin_Percent": NaN,
+      "Brand": NaN,
+      "Size": NaN,
+      "Supplier": NaN,
+      "Last_Updated": NaN,
+      "Status": NaN,
+      "Stock_Quantity": NaN,
+      "Barcode": NaN
+    },
+    "deleted_at": "2025-08-15 17:15:28",
+    "deleted_by": "Admin"
   }
 }

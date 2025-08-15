@@ -1,0 +1,9 @@
+🔄 INVENTORY RESTORATION REPORT
+==================================================
+Date: 2025-08-15 16:42:27
+Products Restored: 1
+Total Transactions Cleared: 1
+
+DETAILED RESTORATION:
+--------------------------------------------------
+ALMOND POUCH 1/-                         | Qty:    1 | Revenue: ₹       1

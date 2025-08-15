@@ -1,1 +1,3 @@
 Transaction_ID,Date,Time,Customer_Name,Customer_Phone,Product_Name,Quantity_Sold,Unit_Price,Total_Amount,Payment_Method,Discount,Final_Amount
+TXN20250815172103,2025-08-15,17:21:03,SHYAM,9599402644,FENA SARAF,2,60,120,Cash,0.0,88.5
+TXN20250815172103,2025-08-15,17:21:03,SHYAM,9599402644,VIM LIQUID POUCH 20/- YELLOW,3,19,57,Cash,0.0,88.5
