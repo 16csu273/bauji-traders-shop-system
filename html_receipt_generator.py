@@ -168,11 +168,12 @@ class HTMLReceiptGenerator:
     body {
       width: 2.8in;
       font-family: 'Segoe UI', Arial, sans-serif;
-      font-size: 11px;
+      font-size: 13px;
+      font-weight: 600;
       margin: 0;
       padding: 0.2in 0.1in;
       background: #fff;
-      color: #222;
+      color: #000;
     }
     .center { text-align: center; }
     .bold { font-weight: bold; }
@@ -185,7 +186,8 @@ class HTMLReceiptGenerator:
     .invoice-table th, .invoice-table td {
       padding: 2px 3px;
       text-align: left;
-      font-size: 10px;
+      font-size: 12px;
+      font-weight: bold;
     }
     .invoice-table th {
       border-bottom: 1px solid #aaa;
@@ -199,14 +201,17 @@ class HTMLReceiptGenerator:
     .right { text-align: right; }
     .total-row td {
       border-top: 1px solid #aaa;
-      font-weight: bold;
+      font-weight: 900;
       background: #f5f5f5;
+      font-size:13px;
     }
     .save-row td {
-      color: #388e3c;
+      color: #011602;
       font-weight: bold;
       border: none;
-      background: #e8f5e9;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .footer {
       border-top: 1px dashed #aaa;
@@ -271,16 +276,16 @@ class HTMLReceiptGenerator:
     <div style="font-size: 10px; font-weight: bold; margin-bottom: 3px;">Pay with UPI</div>
     <img class="qr-code" id="qrcode" alt="UPI QR Code" />
     <div style="font-size: 8px; color: #333; margin-top: 3px; line-height: 1.2;">
-      <div>UPI ID: 9911108114@ybl</div>
-      <div>Payee: Puneet Verma</div>
+      <div>UPI ID: 9911148114@pthdfc</div>
+      <div>Payee: Shri Bauji Traders</div>
       <div style="font-weight: bold;">Amount: ₹{{UPI_AMOUNT}}</div>
     </div>
   </div>
   <script>
-    // Generate UPI QR Code - Puneet Verma's UPI Details
-    const upiId = "9911108114@ybl";
+    // Generate UPI QR Code - Shri Bauji Traders's UPI Details
+    const upiId = "9911148114@pthdfc";
     let amount = "{{UPI_AMOUNT}}";
-    const merchantName = "Puneet Verma";
+    const merchantName = "Shri Bauji Traders";
     
     // Validate amount to prevent NaN
     if (!amount || amount === "nan" || amount === "NaN" || isNaN(parseFloat(amount))) {
@@ -291,7 +296,7 @@ class HTMLReceiptGenerator:
     const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent('Payment to Bauji Traders')}`;
     
     // Generate QR code using qr-server.com API
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(upiUrl)}`;
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-/?size=80x80&data=${encodeURIComponent(upiUrl)}`;
     
     // Set QR code image source
     document.getElementById('qrcode').src = qrCodeUrl;
