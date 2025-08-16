@@ -30,5 +30,29 @@
     "total_purchases": 177.0,
     "last_visit": "2025-08-15",
     "loyalty_points": 1
+  },
+  "8287258412": {
+    "name": "OM",
+    "phone": "8287258412",
+    "email": "",
+    "total_purchases": 88.0,
+    "last_visit": "2025-08-16",
+    "loyalty_points": 1
+  },
+  "OM": {
+    "name": "OM",
+    "phone": "OM",
+    "email": "",
+    "total_purchases": 95.0,
+    "last_visit": "2025-08-16",
+    "loyalty_points": 1
+  },
+  "WALKIN": {
+    "name": "WALKIN",
+    "phone": "WALKIN",
+    "email": "",
+    "total_purchases": 90.0,
+    "last_visit": "2025-08-16",
+    "loyalty_points": 1
   }
 }
