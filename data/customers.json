@@ -51,7 +51,15 @@
     "name": "WALKIN",
     "phone": "WALKIN",
     "email": "",
-    "total_purchases": 90.0,
+    "total_purchases": 130.0,
+    "last_visit": "2025-08-16",
+    "loyalty_points": 2
+  },
+  "8447703762": {
+    "name": "MANOJ",
+    "phone": "8447703762",
+    "email": "",
+    "total_purchases": 280.0,
     "last_visit": "2025-08-16",
     "loyalty_points": 1
   }
