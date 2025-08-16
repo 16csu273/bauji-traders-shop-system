@@ -3783,9 +3783,11 @@ Discount: {first_row['Discount']}%
             # Save to CSV with string format for barcodes to preserve leading zeros
             save_df.to_csv(self.inventory_file, index=False, quoting=1)
             
-            # Clear entry and refresh
+            # Clear entry and RELOAD data from file before refreshing view
             self.barcode_assign_var.set("")
-            self.filter_barcode_products()
+            
+            # Reload barcode inventory data from file to ensure we have latest changes
+            self.load_barcode_inventory()
             
             # Reload main inventory if it exists
             if hasattr(self, 'load_inventory'):
@@ -3830,8 +3832,8 @@ Discount: {first_row['Discount']}%
                 # Save to CSV
                 self.barcode_df.to_csv(self.inventory_file, index=False)
                 
-                # Refresh display
-                self.filter_barcode_products()
+                # Reload barcode inventory data from file to ensure we have latest changes
+                self.load_barcode_inventory()
                 
                 # Reload main inventory if it exists
                 if hasattr(self, 'load_inventory'):
