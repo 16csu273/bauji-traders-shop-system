@@ -888,11 +888,15 @@ class BaujiTradersGUI:
         """Refresh all data displays"""
         self.status_var.set("Refreshing data...")
         try:
+            # Reload shop manager inventory data first
+            self.shop_manager.load_inventory()
+            
             self.load_products()
             self.load_inventory()
             self.load_customers()
             self.load_transaction_history()
             self.update_daily_summary()
+            self.load_barcode_inventory()  # Add this to refresh Barcode Manager
             self.status_var.set("Data refreshed successfully")
         except Exception as e:
             self.status_var.set(f"Error refreshing data: {str(e)}")
@@ -1641,6 +1645,9 @@ class BaujiTradersGUI:
             if "Billing" in current_tab:
                 # Auto-focus barcode entry when billing tab is active
                 self.root.after(100, lambda: self.barcode_entry.focus_set())
+            elif "Barcode Manager" in current_tab:
+                # Refresh barcode manager data when tab is selected
+                self.root.after(100, self.load_barcode_inventory)
         except:
             pass
     
