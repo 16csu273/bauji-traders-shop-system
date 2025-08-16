@@ -51,15 +51,31 @@
     "name": "WALKIN",
     "phone": "WALKIN",
     "email": "",
-    "total_purchases": 180.0,
+    "total_purchases": 480.0,
     "last_visit": "2025-08-16",
-    "loyalty_points": 3
+    "loyalty_points": 4
   },
   "8447703762": {
     "name": "MANOJ",
     "phone": "8447703762",
     "email": "",
     "total_purchases": 280.0,
+    "last_visit": "2025-08-16",
+    "loyalty_points": 1
+  },
+  "989595965656": {
+    "name": "MALINGA",
+    "phone": "989595965656",
+    "email": "",
+    "total_purchases": 117.0,
+    "last_visit": "2025-08-16",
+    "loyalty_points": 1
+  },
+  "8377058667": {
+    "name": "SHREYASH",
+    "phone": "8377058667",
+    "email": "",
+    "total_purchases": 1100.0,
     "last_visit": "2025-08-16",
     "loyalty_points": 1
   }
