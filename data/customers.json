@@ -94,5 +94,37 @@
     "total_purchases": 278.0,
     "last_visit": "2025-08-17",
     "loyalty_points": 1
+  },
+  "SHREYASH": {
+    "name": "SHREYASH",
+    "phone": "SHREYASH",
+    "email": "",
+    "total_purchases": 243.0,
+    "last_visit": "2025-08-17",
+    "loyalty_points": 2
+  },
+  "SONU": {
+    "name": "SONU",
+    "phone": "SONU",
+    "email": "",
+    "total_purchases": 230.0,
+    "last_visit": "2025-08-17",
+    "loyalty_points": 1
+  },
+  "ARUN": {
+    "name": "ARUN",
+    "phone": "ARUN",
+    "email": "",
+    "total_purchases": 470.0,
+    "last_visit": "2025-08-17",
+    "loyalty_points": 2
+  },
+  "MAHAK": {
+    "name": "MAHAK",
+    "phone": "MAHAK",
+    "email": "",
+    "total_purchases": 74.0,
+    "last_visit": "2025-08-17",
+    "loyalty_points": 1
   }
 }
