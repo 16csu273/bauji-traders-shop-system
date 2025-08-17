@@ -78,5 +78,21 @@
     "total_purchases": 1100.0,
     "last_visit": "2025-08-16",
     "loyalty_points": 1
+  },
+  "test": {
+    "name": "test",
+    "phone": "test",
+    "email": "",
+    "total_purchases": 317.0,
+    "last_visit": "2025-08-17",
+    "loyalty_points": 2
+  },
+  "test2": {
+    "name": "test2",
+    "phone": "test2",
+    "email": "",
+    "total_purchases": 278.0,
+    "last_visit": "2025-08-17",
+    "loyalty_points": 1
   }
 }

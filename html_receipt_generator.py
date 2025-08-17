@@ -77,12 +77,16 @@ class HTMLReceiptGenerator:
                 unit_price = float(row['Unit_Price'])
                 line_total = float(row['Total_Amount'])
                 
-                # Find MRP from inventory
-                product_info = inventory_df[inventory_df['Product_Name'] == product_name]
-                if not product_info.empty:
-                    mrp = float(product_info.iloc[0]['MRP'])
+                # First try to get MRP from sales transaction (for fly items and updated records)
+                if 'MRP' in row and pd.notna(row['MRP']) and float(row['MRP']) > 0:
+                    mrp = float(row['MRP'])
                 else:
-                    mrp = unit_price
+                    # Fallback: Find MRP from inventory (for older transactions)
+                    product_info = inventory_df[inventory_df['Product_Name'] == product_name]
+                    if not product_info.empty:
+                        mrp = float(product_info.iloc[0]['MRP'])
+                    else:
+                        mrp = unit_price
                 
                 # Calculate discount percentage
                 if mrp > 0:

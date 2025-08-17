@@ -375,6 +375,8 @@ class BaujiTradersGUI:
                   command=self.remove_from_cart).pack(side=tk.LEFT, padx=2)
         ttk.Button(cart_controls, text="🗑️ Clear Cart", 
                   command=self.clear_cart).pack(side=tk.LEFT, padx=2)
+        ttk.Button(cart_controls, text="✈️ Fly Item", 
+                  command=self.add_fly_item).pack(side=tk.LEFT, padx=2)
         
         # Billing totals
         totals_frame = ttk.LabelFrame(right_frame, text="💰 Billing Summary")
@@ -1767,6 +1769,156 @@ class BaujiTradersGUI:
             self.update_cart_display()
             self.calculate_total()
     
+    def add_fly_item(self):
+        """Add a custom fly item that's not in inventory"""
+        try:
+            # Create a dialog for fly item input
+            fly_dialog = tk.Toplevel(self.root)
+            fly_dialog.title("✈️ Add Fly Item")
+            fly_dialog.geometry("450x400")
+            fly_dialog.transient(self.root)
+            fly_dialog.grab_set()
+            
+            # Center the dialog
+            fly_dialog.update_idletasks()
+            x = (fly_dialog.winfo_screenwidth() // 2) - (225)
+            y = (fly_dialog.winfo_screenheight() // 2) - (200)
+            fly_dialog.geometry(f"450x400+{x}+{y}")
+            
+            # Variables for inputs
+            product_var = tk.StringVar()
+            qty_var = tk.StringVar(value="1")
+            mrp_var = tk.StringVar()
+            sell_var = tk.StringVar()
+            
+            # Create form
+            main_frame = ttk.Frame(fly_dialog, padding=15)
+            main_frame.pack(fill=tk.BOTH, expand=True)
+            
+            ttk.Label(main_frame, text="✈️ Add Fly Item", font=('Arial', 14, 'bold')).pack(pady=(0, 15))
+            
+            # Product Name
+            ttk.Label(main_frame, text="Product Name:").pack(anchor='w', pady=(0, 3))
+            product_entry = ttk.Entry(main_frame, textvariable=product_var, width=40)
+            product_entry.pack(fill=tk.X, pady=(0, 10))
+            product_entry.focus_set()  # Auto-focus first field
+            
+            # Quantity
+            ttk.Label(main_frame, text="Quantity:").pack(anchor='w', pady=(0, 3))
+            qty_entry = ttk.Entry(main_frame, textvariable=qty_var, width=40)
+            qty_entry.pack(fill=tk.X, pady=(0, 10))
+            
+            # MRP
+            ttk.Label(main_frame, text="MRP (₹):").pack(anchor='w', pady=(0, 3))
+            mrp_entry = ttk.Entry(main_frame, textvariable=mrp_var, width=40)
+            mrp_entry.pack(fill=tk.X, pady=(0, 10))
+            
+            # Sell Price
+            ttk.Label(main_frame, text="Sell Price (₹):").pack(anchor='w', pady=(0, 3))
+            sell_entry = ttk.Entry(main_frame, textvariable=sell_var, width=40)
+            sell_entry.pack(fill=tk.X, pady=(0, 15))
+            
+            # Auto-calculate sell price when MRP changes
+            def auto_calc_sell(*args):
+                try:
+                    if mrp_var.get() and not sell_var.get():
+                        mrp_val = float(mrp_var.get())
+                        # Auto-suggest sell price as 90% of MRP
+                        suggested_sell = round(mrp_val * 0.9, 2)
+                        sell_var.set(str(suggested_sell))
+                except:
+                    pass
+            
+            mrp_var.trace('w', auto_calc_sell)
+            
+            result = {'confirmed': False}
+            
+            def on_add():
+                try:
+                    # Validate inputs
+                    product_name = product_var.get().strip()
+                    if not product_name:
+                        messagebox.showerror("Error", "Product name is required!")
+                        return
+                    
+                    quantity = int(qty_var.get())
+                    if quantity <= 0:
+                        messagebox.showerror("Error", "Quantity must be greater than 0!")
+                        return
+                    
+                    # Get MRP value (optional for fly items)
+                    mrp_price = 0
+                    if mrp_var.get().strip():
+                        mrp_price = float(mrp_var.get())
+                        if mrp_price <= 0:
+                            messagebox.showerror("Error", "MRP must be greater than 0 if provided!")
+                            return
+                    
+                    sell_price = float(sell_var.get())
+                    if sell_price <= 0:
+                        messagebox.showerror("Error", "Sell price must be greater than 0!")
+                        return
+                    
+                    # Check if item already exists in cart
+                    existing_item = None
+                    for cart_item in self.current_cart:
+                        if cart_item['product'] == product_name:
+                            existing_item = cart_item
+                            break
+                    
+                    if existing_item:
+                        # Update existing item
+                        existing_item['quantity'] += quantity
+                        existing_item['price'] = sell_price  # Update price
+                        existing_item['mrp'] = mrp_price if mrp_price > 0 else sell_price  # Update MRP
+                        existing_item['total'] = existing_item['quantity'] * sell_price
+                    else:
+                        # Add new fly item to cart
+                        self.current_cart.append({
+                            'product': product_name + " (Fly)",  # Mark as fly item
+                            'quantity': quantity,
+                            'price': sell_price,
+                            'mrp': mrp_price if mrp_price > 0 else sell_price,  # Store MRP for receipt
+                            'total': quantity * sell_price
+                        })
+                    
+                    result['confirmed'] = True
+                    fly_dialog.destroy()
+                    
+                except ValueError as e:
+                    messagebox.showerror("Error", "Please enter valid numbers for quantity and prices!")
+                except Exception as e:
+                    messagebox.showerror("Error", f"Failed to add fly item: {str(e)}")
+            
+            def on_cancel():
+                result['confirmed'] = False
+                fly_dialog.destroy()
+            
+            # Buttons
+            button_frame = ttk.Frame(main_frame)
+            button_frame.pack(fill=tk.X, pady=(10, 0))
+            
+            ttk.Button(button_frame, text="✈️ Add to Cart", command=on_add).pack(side=tk.RIGHT, padx=(10, 0))
+            ttk.Button(button_frame, text="❌ Cancel", command=on_cancel).pack(side=tk.RIGHT)
+            
+            # Enter key binding for quick add
+            def on_enter(event):
+                on_add()
+            
+            fly_dialog.bind('<Return>', on_enter)
+            
+            # Wait for dialog to close
+            fly_dialog.wait_window()
+            
+            # If item was added successfully, update displays
+            if result['confirmed']:
+                self.update_cart_display()
+                self.calculate_total()
+                
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to create fly item dialog: {str(e)}")
+    
+    
     def update_cart_display(self):
         """Update cart tree display"""
         # Clear existing items
@@ -1984,18 +2136,29 @@ class BaujiTradersGUI:
     def process_sale_direct(self, transaction_id, cart_items, customer_info, payment_method, discount_percent, final_amount):
         """Process sale directly without using complex modules"""
         try:
-            # Load current inventory
+            # First, ensure any pending barcode changes are saved
+            if hasattr(self, 'barcode_df') and self.barcode_df is not None:
+                # Save current barcode assignments before loading fresh data
+                try:
+                    self.barcode_df.to_csv(self.shop_manager.inventory_file, index=False)
+                except:
+                    pass  # Continue even if save fails
+            
+            # Load current inventory (this ensures we have the latest data including barcodes)
             inventory_df = pd.read_csv(self.shop_manager.inventory_file)
             
             # Load sales file
             sales_file = self.shop_manager.sales_file
             if os.path.exists(sales_file):
                 sales_df = pd.read_csv(sales_file)
+                # Add MRP column if it doesn't exist (for backward compatibility)
+                if 'MRP' not in sales_df.columns:
+                    sales_df['MRP'] = 0  # Default MRP value for existing records
             else:
                 # Create new sales file
                 sales_columns = [
                     'Transaction_ID', 'Date', 'Time', 'Customer_Name', 'Customer_Phone',
-                    'Product_Name', 'Quantity_Sold', 'Unit_Price', 'Total_Amount', 
+                    'Product_Name', 'Quantity_Sold', 'Unit_Price', 'MRP', 'Total_Amount', 
                     'Payment_Method', 'Discount', 'Final_Amount'
                 ]
                 sales_df = pd.DataFrame(columns=sales_columns)
@@ -2010,20 +2173,30 @@ class BaujiTradersGUI:
                 quantity = item['quantity']
                 unit_price = item['price']
                 total_amount = item['total']
+                # Get MRP - for fly items use stored MRP, for regular items get from inventory
+                item_mrp = item.get('mrp', 0)  # Fly items will have MRP stored
                 
-                # Check and update inventory
-                product_idx = inventory_df[inventory_df['Product_Name'] == product_name].index
-                if len(product_idx) > 0:
-                    current_stock = inventory_df.loc[product_idx[0], 'Quantity']
-                    if current_stock >= quantity:
-                        # Update stock
-                        inventory_df.loc[product_idx[0], 'Quantity'] -= quantity
-                    else:
-                        return {'success': False, 'message': f"Insufficient stock for {product_name}"}
+                # Check if this is a fly item (doesn't exist in inventory)
+                if product_name.endswith(" (Fly)"):
+                    # Fly items don't need inventory checking or stock updates
+                    # Use the MRP that was stored when adding to cart
+                    mrp_for_receipt = item_mrp if item_mrp > 0 else unit_price
                 else:
-                    return {'success': False, 'message': f"Product {product_name} not found"}
+                    # Regular inventory item - check and update inventory
+                    product_idx = inventory_df[inventory_df['Product_Name'] == product_name].index
+                    if len(product_idx) > 0:
+                        current_stock = inventory_df.loc[product_idx[0], 'Quantity']
+                        if current_stock >= quantity:
+                            # Update stock
+                            inventory_df.loc[product_idx[0], 'Quantity'] -= quantity
+                            # Get MRP from inventory
+                            mrp_for_receipt = float(inventory_df.loc[product_idx[0], 'MRP'])
+                        else:
+                            return {'success': False, 'message': f"Insufficient stock for {product_name}"}
+                    else:
+                        return {'success': False, 'message': f"Product {product_name} not found"}
                 
-                # Add to sales record
+                # Add to sales record (for both regular and fly items)
                 new_sale = {
                     'Transaction_ID': transaction_id,
                     'Date': current_date,
@@ -2033,6 +2206,7 @@ class BaujiTradersGUI:
                     'Product_Name': product_name,
                     'Quantity_Sold': quantity,
                     'Unit_Price': unit_price,
+                    'MRP': mrp_for_receipt,  # Store MRP for receipt generation
                     'Total_Amount': total_amount,
                     'Payment_Method': payment_method,
                     'Discount': discount_percent,
@@ -2807,7 +2981,15 @@ Discount: {first_row['Discount']}%
     def add_product_direct(self, product_data):
         """Add product directly to inventory file"""
         try:
-            # Load current inventory
+            # First, ensure any pending barcode changes are saved
+            if hasattr(self, 'barcode_df') and self.barcode_df is not None:
+                # Save current barcode assignments before loading fresh data
+                try:
+                    self.barcode_df.to_csv(self.shop_manager.inventory_file, index=False)
+                except:
+                    pass  # Continue even if save fails
+            
+            # Load current inventory (this ensures we have the latest data including barcodes)
             inventory_df = pd.read_csv(self.shop_manager.inventory_file)
             
             # Convert product name to uppercase
@@ -2832,7 +3014,8 @@ Discount: {first_row['Discount']}%
                 'SP_10_Percent': sp_10_percent,
                 'Quantity': product_data['quantity'],
                 'Category': product_data.get('category', 'General'),
-                'Actual_Margin_Percent': ((mrp - cost_price) / cost_price) * 100
+                'Actual_Margin_Percent': ((mrp - cost_price) / cost_price) * 100,
+                'Barcode': ''  # Add empty barcode field for consistency
             }
             
             # Add to inventory
@@ -2841,8 +3024,15 @@ Discount: {first_row['Discount']}%
             # Fix serial numbers to be sequential integers
             inventory_df['Sr_No'] = range(1, len(inventory_df) + 1)
             
-            # Save inventory
+            # Save inventory (with preserved barcode data)
             inventory_df.to_csv(self.shop_manager.inventory_file, index=False)
+            
+            # Refresh barcode manager data if available
+            if hasattr(self, 'load_barcode_inventory'):
+                try:
+                    self.load_barcode_inventory()
+                except:
+                    pass  # Continue even if refresh fails
             
             return {'success': True}
             
@@ -3031,7 +3221,15 @@ Discount: {first_row['Discount']}%
             return
         
         try:
-            # Load current inventory
+            # First, ensure any pending barcode changes are saved
+            if hasattr(self, 'barcode_df') and self.barcode_df is not None:
+                # Save current barcode assignments before loading fresh data
+                try:
+                    self.barcode_df.to_csv(self.shop_manager.inventory_file, index=False)
+                except:
+                    pass  # Continue even if save fails
+            
+            # Load current inventory (this ensures we have the latest data including barcodes)
             inventory_df = pd.read_csv(self.shop_manager.inventory_file)
             
             # Find and remove the product
@@ -3049,7 +3247,7 @@ Discount: {first_row['Discount']}%
             # Remove the product
             inventory_df = inventory_df[~product_exists]
             
-            # Save updated inventory
+            # Save updated inventory (with preserved barcode data for remaining products)
             inventory_df.to_csv(self.shop_manager.inventory_file, index=False)
             
             # Update shop manager inventory
@@ -3060,6 +3258,10 @@ Discount: {first_row['Discount']}%
             
             # Refresh billing products display to remove deleted product
             self.load_products()
+            
+            # Refresh barcode manager data to maintain barcode assignments
+            if hasattr(self, 'load_barcode_inventory'):
+                self.load_barcode_inventory()
             
             # Show success message
             messagebox.showinfo("Success", f"Product '{product_name}' has been removed successfully")
@@ -3101,7 +3303,15 @@ Discount: {first_row['Discount']}%
     def adjust_stock_direct(self, product_name, adjustment):
         """Adjust stock directly"""
         try:
-            # Load inventory
+            # First, ensure any pending barcode changes are saved
+            if hasattr(self, 'barcode_df') and self.barcode_df is not None:
+                # Save current barcode assignments before loading fresh data
+                try:
+                    self.barcode_df.to_csv(self.shop_manager.inventory_file, index=False)
+                except:
+                    pass  # Continue even if save fails
+            
+            # Load inventory (this ensures we have the latest data including barcodes)
             inventory_df = pd.read_csv(self.shop_manager.inventory_file)
             
             # Find product
@@ -3118,8 +3328,15 @@ Discount: {first_row['Discount']}%
             
             inventory_df.loc[product_idx[0], 'Quantity'] = new_stock
             
-            # Save inventory
+            # Save inventory (with preserved barcode data)
             inventory_df.to_csv(self.shop_manager.inventory_file, index=False)
+            
+            # Refresh barcode manager data if available
+            if hasattr(self, 'load_barcode_inventory'):
+                try:
+                    self.load_barcode_inventory()
+                except:
+                    pass  # Continue even if refresh fails
             
             return {'success': True}
             
