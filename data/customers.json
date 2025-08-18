@@ -51,9 +51,9 @@
     "name": "WALKIN",
     "phone": "WALKIN",
     "email": "",
-    "total_purchases": 480.0,
-    "last_visit": "2025-08-16",
-    "loyalty_points": 4
+    "total_purchases": 800.0,
+    "last_visit": "2025-08-18",
+    "loyalty_points": 6
   },
   "8447703762": {
     "name": "MANOJ",
@@ -115,9 +115,9 @@
     "name": "ARUN",
     "phone": "ARUN",
     "email": "",
-    "total_purchases": 470.0,
+    "total_purchases": 764.69,
     "last_visit": "2025-08-17",
-    "loyalty_points": 2
+    "loyalty_points": 4
   },
   "MAHAK": {
     "name": "MAHAK",
@@ -125,6 +125,46 @@
     "email": "",
     "total_purchases": 74.0,
     "last_visit": "2025-08-17",
+    "loyalty_points": 1
+  },
+  "KAPIL": {
+    "name": "KAPIL",
+    "phone": "KAPIL",
+    "email": "",
+    "total_purchases": 40.0,
+    "last_visit": "2025-08-17",
+    "loyalty_points": 1
+  },
+  "prakash": {
+    "name": "prakash",
+    "phone": "prakash",
+    "email": "",
+    "total_purchases": 117.0,
+    "last_visit": "2025-08-18",
+    "loyalty_points": 1
+  },
+  "RAJKUMAR": {
+    "name": "RAJKUMAR",
+    "phone": "RAJKUMAR",
+    "email": "",
+    "total_purchases": 191.0,
+    "last_visit": "2025-08-18",
+    "loyalty_points": 1
+  },
+  "AMIT VERMA": {
+    "name": "AMIT VERMA",
+    "phone": "AMIT VERMA",
+    "email": "",
+    "total_purchases": 925.0,
+    "last_visit": "2025-08-18",
+    "loyalty_points": 1
+  },
+  "PUNEET VERMA": {
+    "name": "PUNEET VERMA",
+    "phone": "PUNEET VERMA",
+    "email": "",
+    "total_purchases": 905.0,
+    "last_visit": "2025-08-18",
     "loyalty_points": 1
   }
 }
