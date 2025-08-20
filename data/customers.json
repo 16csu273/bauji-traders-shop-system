@@ -166,5 +166,37 @@
     "total_purchases": 905.0,
     "last_visit": "2025-08-18",
     "loyalty_points": 1
+  },
+  "7678331883": {
+    "name": "mr shiv kumar ji",
+    "phone": "7678331883",
+    "email": "",
+    "total_purchases": 1010.0,
+    "last_visit": "2025-08-19",
+    "loyalty_points": 1
+  },
+  "ravi": {
+    "name": "ravi",
+    "phone": "ravi",
+    "email": "",
+    "total_purchases": 46.0,
+    "last_visit": "2025-08-19",
+    "loyalty_points": 1
+  },
+  "amit verma": {
+    "name": "amit verma",
+    "phone": "amit verma",
+    "email": "",
+    "total_purchases": 840.0,
+    "last_visit": "2025-08-19",
+    "loyalty_points": 1
+  },
+  "ankur": {
+    "name": "ankur",
+    "phone": "ankur",
+    "email": "",
+    "total_purchases": 41.0,
+    "last_visit": "2025-08-19",
+    "loyalty_points": 1
   }
 }
