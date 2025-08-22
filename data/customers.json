@@ -198,5 +198,101 @@
     "total_purchases": 41.0,
     "last_visit": "2025-08-19",
     "loyalty_points": 1
+  },
+  "bitu": {
+    "name": "bitu",
+    "phone": "bitu",
+    "email": "",
+    "total_purchases": 42.0,
+    "last_visit": "2025-08-20",
+    "loyalty_points": 1
+  },
+  "ritu": {
+    "name": "ritu",
+    "phone": "ritu",
+    "email": "",
+    "total_purchases": 139.0,
+    "last_visit": "2025-08-20",
+    "loyalty_points": 1
+  },
+  "bhati": {
+    "name": "bhati",
+    "phone": "bhati",
+    "email": "",
+    "total_purchases": 216.0,
+    "last_visit": "2025-08-20",
+    "loyalty_points": 1
+  },
+  "VERMA JI": {
+    "name": "VERMA JI",
+    "phone": "VERMA JI",
+    "email": "",
+    "total_purchases": 855.0,
+    "last_visit": "2025-08-21",
+    "loyalty_points": 1
+  },
+  "munshi g": {
+    "name": "munshi g",
+    "phone": "munshi g",
+    "email": "",
+    "total_purchases": 488.0,
+    "last_visit": "2025-08-21",
+    "loyalty_points": 1
+  },
+  "AA": {
+    "name": "AA",
+    "phone": "AA",
+    "email": "",
+    "total_purchases": 190.0,
+    "last_visit": "2025-08-21",
+    "loyalty_points": 1
+  },
+  "puneet": {
+    "name": "puneet",
+    "phone": "puneet",
+    "email": "",
+    "total_purchases": 130.0,
+    "last_visit": "2025-08-22",
+    "loyalty_points": 1
+  },
+  "8920669200": {
+    "name": "mr charanjet",
+    "phone": "8920669200",
+    "email": "",
+    "total_purchases": 225.0,
+    "last_visit": "2025-08-22",
+    "loyalty_points": 1
+  },
+  "manoj": {
+    "name": "manoj",
+    "phone": "manoj",
+    "email": "",
+    "total_purchases": 270.0,
+    "last_visit": "2025-08-22",
+    "loyalty_points": 1
+  },
+  "verma ji": {
+    "name": "verma ji",
+    "phone": "verma ji",
+    "email": "",
+    "total_purchases": 1446.0,
+    "last_visit": "2025-08-22",
+    "loyalty_points": 2
+  },
+  "malinga": {
+    "name": "malinga",
+    "phone": "malinga",
+    "email": "",
+    "total_purchases": 873.0,
+    "last_visit": "2025-08-22",
+    "loyalty_points": 1
+  },
+  "7011277211": {
+    "name": "amit",
+    "phone": "7011277211",
+    "email": "",
+    "total_purchases": 416.0,
+    "last_visit": "2025-08-22",
+    "loyalty_points": 1
   }
 }
