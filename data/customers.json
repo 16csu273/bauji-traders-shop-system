@@ -294,5 +294,13 @@
     "total_purchases": 416.0,
     "last_visit": "2025-08-22",
     "loyalty_points": 1
+  },
+  "sidhu": {
+    "name": "sidhu",
+    "phone": "sidhu",
+    "email": "",
+    "total_purchases": 440.0,
+    "last_visit": "2025-08-22",
+    "loyalty_points": 1
   }
 }
