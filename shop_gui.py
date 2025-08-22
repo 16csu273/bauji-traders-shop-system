@@ -265,7 +265,7 @@ class BaujiTradersGUI:
         search_frame = ttk.Frame(left_frame)
         search_frame.pack(fill=tk.X, pady=(0, 10))
         
-        ttk.Label(search_frame, text="Search:").pack(side=tk.LEFT)
+        ttk.Label(search_frame, text="Search (Name/Barcode):").pack(side=tk.LEFT)
         self.product_search_var = tk.StringVar()
         self.product_search_var.trace('w', self.filter_products)
         search_entry = ttk.Entry(search_frame, textvariable=self.product_search_var)
@@ -453,7 +453,7 @@ class BaujiTradersGUI:
         search_frame = ttk.Frame(top_frame)
         search_frame.pack(fill=tk.X, pady=(0, 10))
         
-        ttk.Label(search_frame, text="🔍 Search Products:", font=("Arial", 12, "bold")).pack(side=tk.LEFT)
+        ttk.Label(search_frame, text="🔍 Search Products (Name/Barcode):", font=("Arial", 12, "bold")).pack(side=tk.LEFT)
         self.inventory_search_var = tk.StringVar()
         self.inventory_search_var.trace('w', self.filter_inventory)
         search_entry = ttk.Entry(search_frame, textvariable=self.inventory_search_var, width=30)
@@ -697,7 +697,7 @@ class BaujiTradersGUI:
         search_frame = ttk.Frame(control_frame)
         search_frame.pack(fill=tk.X, pady=(0, 10))
         
-        ttk.Label(search_frame, text="Search:").pack(side=tk.LEFT)
+        ttk.Label(search_frame, text="Search (Name/Barcode):").pack(side=tk.LEFT)
         self.barcode_search_var = tk.StringVar()
         self.barcode_search_var.trace('w', self.filter_barcode_products)
         search_entry = ttk.Entry(search_frame, textvariable=self.barcode_search_var, width=30)
@@ -978,11 +978,16 @@ class BaujiTradersGUI:
                 elif any(word in product_name for word in ['PATANJALI']):
                     category = "Ayurvedic Products"
                 
-                # Calculate sell price: cost_price + 40% of (MRP - cost_price)
+                # Use stored sell price from CSV (fallback to calculated if not available)
                 cost_price = row['Cost_Price']
                 mrp = row['MRP']
-                profit_margin = mrp - cost_price
-                sell_price = math.ceil(cost_price + (0.40 * profit_margin))
+                
+                if 'Sell_Price' in row and pd.notna(row['Sell_Price']) and row['Sell_Price'] > 0:
+                    sell_price = float(row['Sell_Price'])
+                else:
+                    # Fallback: Calculate sell price: cost_price + 40% of (MRP - cost_price)
+                    profit_margin = mrp - cost_price
+                    sell_price = math.ceil(cost_price + (0.40 * profit_margin))
                 
                 self.products_tree.insert('', tk.END, values=(
                     row['Product_Name'],        # Name
@@ -1075,11 +1080,16 @@ class BaujiTradersGUI:
                 
                 stock_value = row['Quantity'] * row['Cost_Price']
                 
-                # Calculate sell price: cost_price + 40% of (MRP - cost_price)
+                # Use stored sell price from CSV (fallback to calculated if not available)
                 cost_price = row['Cost_Price']
                 mrp = row['MRP']
-                profit_margin = mrp - cost_price
-                sell_price = math.ceil(cost_price + (0.40 * profit_margin))
+                
+                if 'Sell_Price' in row and pd.notna(row['Sell_Price']) and row['Sell_Price'] > 0:
+                    sell_price = float(row['Sell_Price'])
+                else:
+                    # Fallback: Calculate sell price: cost_price + 40% of (MRP - cost_price)
+                    profit_margin = mrp - cost_price
+                    sell_price = math.ceil(cost_price + (0.40 * profit_margin))
                 
                 self.inventory_tree.insert('', tk.END, values=(
                     row['Product_Name'],
@@ -1171,7 +1181,7 @@ class BaujiTradersGUI:
             print(f"Error updating daily summary: {e}")
     
     def filter_products(self, *args):
-        """Filter products based on search"""
+        """Filter products based on search (by name or barcode)"""
         search_term = self.product_search_var.get().lower()
         
         # Clear and reload products with filter
@@ -1180,11 +1190,17 @@ class BaujiTradersGUI:
         
         try:
             inventory_file = self.shop_manager.inventory_file
-            df = pd.read_csv(inventory_file)
+            df = pd.read_csv(inventory_file, dtype={'Barcode': str})
             
-            # Filter products
+            # Clean barcode column
+            df['Barcode'] = df['Barcode'].fillna('').astype(str)
+            df['Barcode'] = df['Barcode'].replace('nan', '')
+            
+            # Filter products by name OR barcode
             if search_term:
-                df = df[df['Product_Name'].str.lower().str.contains(search_term, na=False)]
+                name_match = df['Product_Name'].str.lower().str.contains(search_term, na=False)
+                barcode_match = df['Barcode'].str.lower().str.contains(search_term, na=False)
+                df = df[name_match | barcode_match]
             
             # Sort filtered products alphabetically (case-insensitive)
             df = df.sort_values('Product_Name', key=lambda x: x.str.lower())
@@ -1249,11 +1265,16 @@ class BaujiTradersGUI:
                 elif any(word in product_name for word in ['PATANJALI']):
                     category = "Ayurvedic Products"
                 
-                # Calculate sell price: cost_price + 40% of (MRP - cost_price)
+                # Use stored sell price from CSV (fallback to calculated if not available)
                 cost_price = row['Cost_Price']
                 mrp = row['MRP']
-                profit_margin = mrp - cost_price
-                sell_price = math.ceil(cost_price + (0.40 * profit_margin))
+                
+                if 'Sell_Price' in row and pd.notna(row['Sell_Price']) and row['Sell_Price'] > 0:
+                    sell_price = float(row['Sell_Price'])
+                else:
+                    # Fallback: Calculate sell price: cost_price + 40% of (MRP - cost_price)
+                    profit_margin = mrp - cost_price
+                    sell_price = math.ceil(cost_price + (0.40 * profit_margin))
                 
                 self.products_tree.insert('', tk.END, values=(
                     row['Product_Name'],        # Name
@@ -1267,7 +1288,7 @@ class BaujiTradersGUI:
             print(f"Error filtering products: {e}")
     
     def filter_inventory(self, *args):
-        """Filter inventory based on search"""
+        """Filter inventory based on search (by name or barcode)"""
         search_term = self.inventory_search_var.get().lower()
         
         # Clear existing items
@@ -1277,12 +1298,18 @@ class BaujiTradersGUI:
         try:
             # Load inventory data using shop_manager's path
             inventory_file = self.shop_manager.inventory_file
-            df = pd.read_csv(inventory_file)
+            df = pd.read_csv(inventory_file, dtype={'Barcode': str})
             
-            # Filter inventory
+            # Clean barcode column
+            df['Barcode'] = df['Barcode'].fillna('').astype(str)
+            df['Barcode'] = df['Barcode'].replace('nan', '')
+            
+            # Filter inventory by name OR barcode
             original_count = len(df)
             if search_term:
-                df = df[df['Product_Name'].str.lower().str.contains(search_term, na=False)]
+                name_match = df['Product_Name'].str.lower().str.contains(search_term, na=False)
+                barcode_match = df['Barcode'].str.lower().str.contains(search_term, na=False)
+                df = df[name_match | barcode_match]
             
             # Sort filtered inventory alphabetically (case-insensitive)
             df = df.sort_values('Product_Name', key=lambda x: x.str.lower())
@@ -3111,6 +3138,30 @@ Discount: {first_row['Discount']}%
             mrp_entry.pack(fill=tk.X, pady=(0, 10))
             fields['MRP'] = mrp_var
             
+            # Sell Price (editable)
+            ttk.Label(main_frame, text="Sell Price (₹):", font=("Arial", 10, "bold")).pack(anchor=tk.W, pady=(5, 2))
+            sell_price_var = tk.StringVar(value=str(current_data.get('Sell_Price', 0)))
+            sell_price_entry = ttk.Entry(main_frame, textvariable=sell_price_var, width=50)
+            sell_price_entry.pack(fill=tk.X, pady=(0, 10))
+            fields['Sell_Price'] = sell_price_var
+            
+            # Auto-calculate sell price button
+            def auto_calculate_sell_price():
+                try:
+                    cost_price = float(cost_var.get())
+                    mrp = float(mrp_var.get())
+                    if cost_price > 0 and mrp > 0:
+                        profit_margin = mrp - cost_price
+                        calculated_sell_price = math.ceil(cost_price + (0.40 * profit_margin))
+                        sell_price_var.set(str(calculated_sell_price))
+                except ValueError:
+                    pass
+            
+            auto_calc_frame = ttk.Frame(main_frame)
+            auto_calc_frame.pack(fill=tk.X, pady=(0, 10))
+            ttk.Button(auto_calc_frame, text="🔄 Auto-Calculate Sell Price (40% formula)", 
+                      command=auto_calculate_sell_price).pack(side=tk.LEFT)
+            
             # Stock Quantity
             ttk.Label(main_frame, text="Stock Quantity:", font=("Arial", 10, "bold")).pack(anchor=tk.W, pady=(5, 2))
             stock_var = tk.StringVar(value=str(current_data.get('Quantity', 0)))
@@ -3147,9 +3198,10 @@ Discount: {first_row['Discount']}%
                     # Validate inputs
                     cost_price = float(fields['Cost_Price'].get())
                     mrp = float(fields['MRP'].get())
+                    sell_price = float(fields['Sell_Price'].get())
                     stock = int(fields['Quantity'].get())
                     
-                    if cost_price <= 0 or mrp <= 0 or stock < 0:
+                    if cost_price <= 0 or mrp <= 0 or sell_price <= 0 or stock < 0:
                         messagebox.showerror("Error", "Please enter valid positive values")
                         return
                     
@@ -3170,6 +3222,7 @@ Discount: {first_row['Discount']}%
                     self.shop_manager.inventory.loc[idx, 'Category'] = fields['Category'].get()
                     self.shop_manager.inventory.loc[idx, 'Cost_Price'] = cost_price
                     self.shop_manager.inventory.loc[idx, 'MRP'] = mrp
+                    self.shop_manager.inventory.loc[idx, 'Sell_Price'] = sell_price  # Save the sell price
                     self.shop_manager.inventory.loc[idx, 'SP_5_Percent'] = sp_5_percent
                     self.shop_manager.inventory.loc[idx, 'SP_10_Percent'] = sp_10_percent
                     self.shop_manager.inventory.loc[idx, 'Quantity'] = stock
@@ -3855,10 +3908,11 @@ Discount: {first_row['Discount']}%
         else:
             filtered_df = self.barcode_df.copy()
         
-        # Apply search filter
+        # Apply search filter by name OR barcode
         if search_term:
-            mask = filtered_df['Product_Name'].str.lower().str.contains(search_term, na=False)
-            filtered_df = filtered_df[mask]
+            name_mask = filtered_df['Product_Name'].str.lower().str.contains(search_term, na=False)
+            barcode_mask = filtered_df['Barcode'].str.lower().str.contains(search_term, na=False)
+            filtered_df = filtered_df[name_mask | barcode_mask]
         
         self.barcode_filtered_df = filtered_df
         self.update_barcode_tree()

@@ -225,30 +225,39 @@ class StockManager:
         print("=" * 30)
         
         # Search product
-        search_term = input("🔍 Search product: ").strip()
+        search_term = input("🔍 Search product (name or barcode): ").strip()
         
         if not search_term:
             return
             
-        # Find matching products
-        matches = self.shop.inventory[self.shop.inventory['Product_Name'].str.contains(search_term, case=False, na=False)]
+        # Load fresh data with barcode handling
+        df = pd.read_csv(self.shop.inventory_file, dtype={'Barcode': str})
+        df['Barcode'] = df['Barcode'].fillna('').astype(str).replace('nan', '')
         
-        if len(matches) == 0:
+        # Find matching products by name OR barcode
+        name_matches = df[df['Product_Name'].str.contains(search_term, case=False, na=False)]
+        barcode_matches = df[df['Barcode'].str.contains(search_term, case=False, na=False) & (df['Barcode'] != '')]
+        
+        # Combine matches and remove duplicates
+        all_matches = pd.concat([name_matches, barcode_matches]).drop_duplicates()
+        
+        if len(all_matches) == 0:
             print("❌ No products found")
             return
-        elif len(matches) == 1:
-            product = matches.iloc[0]
-            product_index = matches.index[0]
+        elif len(all_matches) == 1:
+            product = all_matches.iloc[0]
+            product_index = all_matches.index[0]
         else:
-            print(f"\n📋 Found {len(matches)} products:")
-            for idx, (_, row) in enumerate(matches.head(10).iterrows()):
-                print(f"{idx+1}. {row['Product_Name']} - Current Stock: {row['Quantity']}")
+            print(f"\n📋 Found {len(all_matches)} products:")
+            for idx, (_, row) in enumerate(all_matches.head(10).iterrows()):
+                barcode_info = f" [Barcode: {row['Barcode']}]" if row['Barcode'] else ""
+                print(f"{idx+1}. {row['Product_Name']}{barcode_info} - Current Stock: {row['Quantity']}")
             
             try:
                 choice = int(input("\nSelect product: ")) - 1
-                if 0 <= choice < len(matches):
-                    product = matches.iloc[choice]
-                    product_index = matches.index[choice]
+                if 0 <= choice < len(all_matches):
+                    product = all_matches.iloc[choice]
+                    product_index = all_matches.index[choice]
                 else:
                     print("❌ Invalid selection")
                     return
@@ -404,9 +413,25 @@ class StockManager:
                 filtered_df = stock_df[stock_df['Date'] >= week_ago]
                 title = "Last 7 Days Stock Movements"
             elif choice == '3':
-                product_search = input("Enter product name: ").strip()
-                filtered_df = stock_df[stock_df['Product_Name'].str.contains(product_search, case=False, na=False)]
-                title = f"Stock Movements for '{product_search}'"
+                product_search = input("Enter product name or barcode: ").strip()
+                
+                # Load inventory to match barcode to product name if needed
+                inventory_df = pd.read_csv(self.shop.inventory_file, dtype={'Barcode': str})
+                inventory_df['Barcode'] = inventory_df['Barcode'].fillna('').astype(str).replace('nan', '')
+                
+                # Check if search term is a barcode
+                barcode_match = inventory_df[inventory_df['Barcode'].str.contains(product_search, case=False, na=False) & (inventory_df['Barcode'] != '')]
+                
+                if not barcode_match.empty:
+                    # If barcode found, get the product name
+                    product_names = barcode_match['Product_Name'].tolist()
+                    # Filter stock movements by product name(s)
+                    filtered_df = stock_df[stock_df['Product_Name'].isin(product_names)]
+                    title = f"Stock Movements for Barcode '{product_search}'"
+                else:
+                    # Search by product name as before
+                    filtered_df = stock_df[stock_df['Product_Name'].str.contains(product_search, case=False, na=False)]
+                    title = f"Stock Movements for '{product_search}'"
             else:
                 filtered_df = stock_df.tail(50)
                 title = "Recent Stock Movements (Last 50)"
