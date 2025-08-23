@@ -318,5 +318,37 @@
     "total_purchases": 95.0,
     "last_visit": "2025-08-23",
     "loyalty_points": 1
+  },
+  "8826299377": {
+    "name": "AMIT",
+    "phone": "8826299377",
+    "email": "",
+    "total_purchases": 475.0,
+    "last_visit": "2025-08-23",
+    "loyalty_points": 1
+  },
+  "A": {
+    "name": "A",
+    "phone": "A",
+    "email": "",
+    "total_purchases": 740.0,
+    "last_visit": "2025-08-23",
+    "loyalty_points": 2
+  },
+  "MEHAK": {
+    "name": "MEHAK",
+    "phone": "MEHAK",
+    "email": "",
+    "total_purchases": 64.0,
+    "last_visit": "2025-08-23",
+    "loyalty_points": 1
+  },
+  "LAL BHADUR": {
+    "name": "LAL BHADUR",
+    "phone": "LAL BHADUR",
+    "email": "",
+    "total_purchases": 692.0,
+    "last_visit": "2025-08-23",
+    "loyalty_points": 1
   }
 }
