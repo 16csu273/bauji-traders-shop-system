@@ -302,5 +302,21 @@
     "total_purchases": 440.0,
     "last_visit": "2025-08-22",
     "loyalty_points": 1
+  },
+  "heena": {
+    "name": "heena",
+    "phone": "heena",
+    "email": "",
+    "total_purchases": 900.0,
+    "last_visit": "2025-08-23",
+    "loyalty_points": 1
+  },
+  "CA MANOJ BHAI": {
+    "name": "CA MANOJ BHAI",
+    "phone": "CA MANOJ BHAI",
+    "email": "",
+    "total_purchases": 95.0,
+    "last_visit": "2025-08-23",
+    "loyalty_points": 1
   }
 }
