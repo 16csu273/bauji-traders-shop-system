@@ -587,5 +587,36 @@
     },
     "deleted_at": "2025-08-20 14:49:30",
     "deleted_by": "Admin"
+  },
+  "SAVOUR VRMICELLI SEVAIYA 800G": {
+    "product_data": {
+      "Sr_No": 411,
+      "Product_Name": "SAVOUR VRMICELLI SEVAIYA 800G",
+      "Quantity": 6,
+      "Unit": NaN,
+      "MRP": 115.0,
+      "Purchase_Rate": NaN,
+      "Amount": NaN,
+      "Category": "Instant Food",
+      "Cost_Price": 85.0,
+      "Sell_Price": 97.0,
+      "Actual_Margin_Percent": 35.294117647058826,
+      "Actual_Profit_Per_Unit": NaN,
+      "Total_Actual_Profit": NaN,
+      "SP_5_Percent": 109.25,
+      "SP_10_Percent": 103.5,
+      "SP_5_Margin_Percent": NaN,
+      "SP_10_Margin_Percent": NaN,
+      "Brand": NaN,
+      "Size": NaN,
+      "Supplier": NaN,
+      "Last_Updated": NaN,
+      "Status": NaN,
+      "Stock_Quantity": NaN,
+      "Barcode": "8906020730601.0",
+      "Barcode_Clean": "8906020730601"
+    },
+    "deleted_at": "2025-08-24 13:08:30",
+    "deleted_by": "Admin"
   }
 }

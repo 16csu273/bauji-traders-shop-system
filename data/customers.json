@@ -51,9 +51,9 @@
     "name": "WALKIN",
     "phone": "WALKIN",
     "email": "",
-    "total_purchases": 800.0,
-    "last_visit": "2025-08-18",
-    "loyalty_points": 6
+    "total_purchases": 1390.0,
+    "last_visit": "2025-08-24",
+    "loyalty_points": 8
   },
   "8447703762": {
     "name": "MANOJ",
@@ -339,9 +339,9 @@
     "name": "MEHAK",
     "phone": "MEHAK",
     "email": "",
-    "total_purchases": 64.0,
-    "last_visit": "2025-08-23",
-    "loyalty_points": 1
+    "total_purchases": 218.0,
+    "last_visit": "2025-08-25",
+    "loyalty_points": 2
   },
   "LAL BHADUR": {
     "name": "LAL BHADUR",
@@ -349,6 +349,70 @@
     "email": "",
     "total_purchases": 692.0,
     "last_visit": "2025-08-23",
+    "loyalty_points": 1
+  },
+  "aaa": {
+    "name": "aaa",
+    "phone": "aaa",
+    "email": "",
+    "total_purchases": 85.0,
+    "last_visit": "2025-08-24",
+    "loyalty_points": 1
+  },
+  "MANISH": {
+    "name": "MANISH",
+    "phone": "MANISH",
+    "email": "",
+    "total_purchases": 1084.0,
+    "last_visit": "2025-08-24",
+    "loyalty_points": 1
+  },
+  "PUNEET": {
+    "name": "PUNEET",
+    "phone": "PUNEET",
+    "email": "",
+    "total_purchases": 186.0,
+    "last_visit": "2025-08-24",
+    "loyalty_points": 1
+  },
+  "9811841552": {
+    "name": "KAILASH",
+    "phone": "9811841552",
+    "email": "",
+    "total_purchases": 572.0,
+    "last_visit": "2025-08-24",
+    "loyalty_points": 1
+  },
+  "9360123071": {
+    "name": "PARDEEP",
+    "phone": "9360123071",
+    "email": "",
+    "total_purchases": 155.0,
+    "last_visit": "2025-08-24",
+    "loyalty_points": 1
+  },
+  "YOGENDER": {
+    "name": "YOGENDER",
+    "phone": "YOGENDER",
+    "email": "",
+    "total_purchases": 90.0,
+    "last_visit": "2025-08-24",
+    "loyalty_points": 1
+  },
+  "SANDEEP": {
+    "name": "SANDEEP",
+    "phone": "SANDEEP",
+    "email": "",
+    "total_purchases": 188.0,
+    "last_visit": "2025-08-25",
+    "loyalty_points": 1
+  },
+  "GOURAV": {
+    "name": "GOURAV",
+    "phone": "GOURAV",
+    "email": "",
+    "total_purchases": 535.0,
+    "last_visit": "2025-08-25",
     "loyalty_points": 1
   }
 }
