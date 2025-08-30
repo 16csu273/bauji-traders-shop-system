@@ -371,9 +371,9 @@
     "name": "PUNEET",
     "phone": "PUNEET",
     "email": "",
-    "total_purchases": 186.0,
-    "last_visit": "2025-08-24",
-    "loyalty_points": 1
+    "total_purchases": 661.0,
+    "last_visit": "2025-08-29",
+    "loyalty_points": 2
   },
   "9811841552": {
     "name": "KAILASH",
@@ -413,6 +413,54 @@
     "email": "",
     "total_purchases": 535.0,
     "last_visit": "2025-08-25",
+    "loyalty_points": 1
+  },
+  "ammmm": {
+    "name": "ammmm",
+    "phone": "ammmm",
+    "email": "",
+    "total_purchases": 516.0,
+    "last_visit": "2025-08-27",
+    "loyalty_points": 1
+  },
+  "9105876242": {
+    "name": "MOHIT",
+    "phone": "9105876242",
+    "email": "",
+    "total_purchases": 2911.0,
+    "last_visit": "2025-08-27",
+    "loyalty_points": 1
+  },
+  "rajat": {
+    "name": "rajat",
+    "phone": "rajat",
+    "email": "",
+    "total_purchases": 1046.0,
+    "last_visit": "2025-08-28",
+    "loyalty_points": 2
+  },
+  "RAHUL": {
+    "name": "RAHUL",
+    "phone": "RAHUL",
+    "email": "",
+    "total_purchases": 635.0,
+    "last_visit": "2025-08-29",
+    "loyalty_points": 1
+  },
+  "sunil chahuan": {
+    "name": "sunil chahuan",
+    "phone": "sunil chahuan",
+    "email": "",
+    "total_purchases": 576.0,
+    "last_visit": "2025-08-30",
+    "loyalty_points": 1
+  },
+  "GS": {
+    "name": "GS",
+    "phone": "GS",
+    "email": "",
+    "total_purchases": 180.0,
+    "last_visit": "2025-08-30",
     "loyalty_points": 1
   }
 }

@@ -618,5 +618,36 @@
     },
     "deleted_at": "2025-08-24 13:08:30",
     "deleted_by": "Admin"
+  },
+  "DABUR HONEY 500GM": {
+    "product_data": {
+      "Sr_No": 525,
+      "Product_Name": "DABUR HONEY 500GM",
+      "Quantity": 20,
+      "Unit": NaN,
+      "MRP": 250.0,
+      "Purchase_Rate": NaN,
+      "Amount": NaN,
+      "Category": "General",
+      "Cost_Price": 180.0,
+      "Sell_Price": NaN,
+      "Actual_Margin_Percent": 38.88888888888889,
+      "Actual_Profit_Per_Unit": NaN,
+      "Total_Actual_Profit": NaN,
+      "SP_5_Percent": 237.5,
+      "SP_10_Percent": 225.0,
+      "SP_5_Margin_Percent": NaN,
+      "SP_10_Margin_Percent": NaN,
+      "Brand": NaN,
+      "Size": NaN,
+      "Supplier": NaN,
+      "Last_Updated": NaN,
+      "Status": NaN,
+      "Stock_Quantity": NaN,
+      "Barcode": NaN,
+      "Barcode_Clean": NaN
+    },
+    "deleted_at": "2025-08-30 17:49:42",
+    "deleted_by": "Admin"
   }
 }
