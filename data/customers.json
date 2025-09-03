@@ -462,5 +462,61 @@
     "total_purchases": 180.0,
     "last_visit": "2025-08-30",
     "loyalty_points": 1
+  },
+  "9582620850": {
+    "name": "VINOD JI",
+    "phone": "9582620850",
+    "email": "",
+    "total_purchases": 3315.0,
+    "last_visit": "2025-08-31",
+    "loyalty_points": 1
+  },
+  "SACHIN": {
+    "name": "SACHIN",
+    "phone": "SACHIN",
+    "email": "",
+    "total_purchases": 3468.0,
+    "last_visit": "2025-08-31",
+    "loyalty_points": 1
+  },
+  "MANOJ": {
+    "name": "MANOJ",
+    "phone": "MANOJ",
+    "email": "",
+    "total_purchases": 1955.0,
+    "last_visit": "2025-08-31",
+    "loyalty_points": 1
+  },
+  "gg": {
+    "name": "gg",
+    "phone": "gg",
+    "email": "",
+    "total_purchases": 495.0,
+    "last_visit": "2025-09-02",
+    "loyalty_points": 1
+  },
+  "ROBIN KAMBOJ": {
+    "name": "ROBIN KAMBOJ",
+    "phone": "ROBIN KAMBOJ",
+    "email": "",
+    "total_purchases": 45.0,
+    "last_visit": "2025-09-02",
+    "loyalty_points": 1
+  },
+  "9210858387": {
+    "name": "laxmi g",
+    "phone": "9210858387",
+    "email": "",
+    "total_purchases": 5267.0,
+    "last_visit": "2025-09-03",
+    "loyalty_points": 2
+  },
+  "jyoti ji": {
+    "name": "jyoti ji",
+    "phone": "jyoti ji",
+    "email": "",
+    "total_purchases": 1715.0,
+    "last_visit": "2025-09-03",
+    "loyalty_points": 1
   }
 }
