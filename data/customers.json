@@ -526,5 +526,21 @@
     "total_purchases": 872.0,
     "last_visit": "2025-09-06",
     "loyalty_points": 2
+  },
+  "8802620690": {
+    "name": "KOSHAL",
+    "phone": "8802620690",
+    "email": "",
+    "total_purchases": 522.0,
+    "last_visit": "2025-09-11",
+    "loyalty_points": 1
+  },
+  "ANIL": {
+    "name": "ANIL",
+    "phone": "ANIL",
+    "email": "",
+    "total_purchases": 220.0,
+    "last_visit": "2025-09-11",
+    "loyalty_points": 1
   }
 }
