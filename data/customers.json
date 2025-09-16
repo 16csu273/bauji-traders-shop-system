@@ -504,12 +504,12 @@
     "loyalty_points": 1
   },
   "9210858387": {
-    "name": "laxmi g",
+    "name": "LAXMI",
     "phone": "9210858387",
     "email": "",
-    "total_purchases": 5267.0,
-    "last_visit": "2025-09-03",
-    "loyalty_points": 2
+    "total_purchases": 9204.0,
+    "last_visit": "2025-09-13",
+    "loyalty_points": 3
   },
   "jyoti ji": {
     "name": "jyoti ji",
@@ -541,6 +541,22 @@
     "email": "",
     "total_purchases": 220.0,
     "last_visit": "2025-09-11",
+    "loyalty_points": 1
+  },
+  "8800380668": {
+    "name": "MONU",
+    "phone": "8800380668",
+    "email": "",
+    "total_purchases": 12777.0,
+    "last_visit": "2025-09-13",
+    "loyalty_points": 3
+  },
+  "ajay": {
+    "name": "ajay",
+    "phone": "ajay",
+    "email": "",
+    "total_purchases": 480.0,
+    "last_visit": "2025-09-14",
     "loyalty_points": 1
   }
 }
