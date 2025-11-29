@@ -558,5 +558,125 @@
     "total_purchases": 480.0,
     "last_visit": "2025-09-14",
     "loyalty_points": 1
+  },
+  "9899192919": {
+    "name": "GOYAL STORE",
+    "phone": "9899192919",
+    "email": "",
+    "total_purchases": 24640.0,
+    "last_visit": "2025-09-18",
+    "loyalty_points": 2
+  },
+  "aa": {
+    "name": "aa",
+    "phone": "aa",
+    "email": "",
+    "total_purchases": 1129.0,
+    "last_visit": "2025-10-11",
+    "loyalty_points": 2
+  },
+  "9555269666": {
+    "name": "SUPER MART",
+    "phone": "9555269666",
+    "email": "",
+    "total_purchases": 8930.0,
+    "last_visit": "2025-09-22",
+    "loyalty_points": 1
+  },
+  "LAXMI": {
+    "name": "LAXMI",
+    "phone": "LAXMI",
+    "email": "",
+    "total_purchases": 1243.0,
+    "last_visit": "2025-09-22",
+    "loyalty_points": 1
+  },
+  "khule masale": {
+    "name": "khule masale",
+    "phone": "khule masale",
+    "email": "",
+    "total_purchases": 10530.0,
+    "last_visit": "2025-09-24",
+    "loyalty_points": 1
+  },
+  "dinesh": {
+    "name": "dinesh",
+    "phone": "dinesh",
+    "email": "",
+    "total_purchases": 58.0,
+    "last_visit": "2025-09-29",
+    "loyalty_points": 1
+  },
+  "99015991": {
+    "name": "SWASTIKA AUTOMATICS INDIA",
+    "phone": "99015991",
+    "email": "",
+    "total_purchases": 225.0,
+    "last_visit": "2025-11-07",
+    "loyalty_points": 1
+  },
+  "CASH": {
+    "name": "CASH",
+    "phone": "CASH",
+    "email": "",
+    "total_purchases": 251.0,
+    "last_visit": "2025-11-12",
+    "loyalty_points": 1
+  },
+  "none": {
+    "name": "none",
+    "phone": "none",
+    "email": "",
+    "total_purchases": 218.0,
+    "last_visit": "2025-11-18",
+    "loyalty_points": 1
+  },
+  "om madical": {
+    "name": "om madical",
+    "phone": "om madical",
+    "email": "",
+    "total_purchases": 4252.0,
+    "last_visit": "2025-11-19",
+    "loyalty_points": 1
+  },
+  "OM MADICAL STORE": {
+    "name": "OM MADICAL STORE",
+    "phone": "OM MADICAL STORE",
+    "email": "",
+    "total_purchases": 5626.0,
+    "last_visit": "2025-11-19",
+    "loyalty_points": 1
+  },
+  "9999015991": {
+    "name": "SWASTIK AUTOMATIC INDIA",
+    "phone": "9999015991",
+    "email": "",
+    "total_purchases": 492.0,
+    "last_visit": "2025-11-21",
+    "loyalty_points": 2
+  },
+  "NONE": {
+    "name": "NONE",
+    "phone": "NONE",
+    "email": "",
+    "total_purchases": 436.0,
+    "last_visit": "2025-11-27",
+    "loyalty_points": 2
+  },
+  "9540079484": {
+    "name": "RPS",
+    "phone": "9540079484",
+    "email": "",
+    "total_purchases": 218.0,
+    "last_visit": "2025-11-24",
+    "loyalty_points": 1
+  },
+  "SWASTIK AUTOMOBILE INDIA": {
+    "name": "SWASTIK AUTOMOBILE INDIA",
+    "phone": "SWASTIK AUTOMOBILE INDIA",
+    "email": "",
+    "total_purchases": 230.0,
+    "last_visit": "2025-11-27",
+    "loyalty_points": 1
   }
 }
