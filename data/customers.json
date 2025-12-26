@@ -504,12 +504,12 @@
     "loyalty_points": 1
   },
   "9210858387": {
-    "name": "LAXMI",
+    "name": "LAXMI JI",
     "phone": "9210858387",
     "email": "",
-    "total_purchases": 9204.0,
-    "last_visit": "2025-09-13",
-    "loyalty_points": 3
+    "total_purchases": 12854.0,
+    "last_visit": "2025-12-02",
+    "loyalty_points": 4
   },
   "jyoti ji": {
     "name": "jyoti ji",
@@ -651,9 +651,9 @@
     "name": "SWASTIK AUTOMATIC INDIA",
     "phone": "9999015991",
     "email": "",
-    "total_purchases": 492.0,
-    "last_visit": "2025-11-21",
-    "loyalty_points": 2
+    "total_purchases": 2031.0,
+    "last_visit": "2025-12-23",
+    "loyalty_points": 5
   },
   "NONE": {
     "name": "NONE",
@@ -677,6 +677,38 @@
     "email": "",
     "total_purchases": 230.0,
     "last_visit": "2025-11-27",
+    "loyalty_points": 1
+  },
+  "9891615590": {
+    "name": "AMUL DOUD GADI",
+    "phone": "9891615590",
+    "email": "",
+    "total_purchases": 4036.92,
+    "last_visit": "2025-12-11",
+    "loyalty_points": 1
+  },
+  "SWASTIK AUTOMATIC INDIA": {
+    "name": "SWASTIK AUTOMATIC INDIA",
+    "phone": "SWASTIK AUTOMATIC INDIA",
+    "email": "",
+    "total_purchases": 480.0,
+    "last_visit": "2025-12-26",
+    "loyalty_points": 2
+  },
+  "RPS": {
+    "name": "RPS",
+    "phone": "RPS",
+    "email": "",
+    "total_purchases": 1342.0,
+    "last_visit": "2025-12-25",
+    "loyalty_points": 4
+  },
+  "999901991": {
+    "name": "SWASTIK AUTOMATIC INDIA",
+    "phone": "999901991",
+    "email": "",
+    "total_purchases": 103.0,
+    "last_visit": "2025-12-17",
     "loyalty_points": 1
   }
 }
